@@ -5,46 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hotel Cordelia - 통합 관리 시스템</title>
     <style>
-        :root { --bg-main: #0b0f19; --card-bg: #1f2937; --text-dark: #ffffff; --accent-green: #84cc16; --border-color: #374151; }
+        :root { --bg-main: #0b0f19; --card-bg: #1f2937; --text-dark: #ffffff; --accent-green: #84cc16; --accent-red: #ef4444; --border-color: #374151; }
         body { background-color: var(--bg-main); color: var(--text-dark); padding: 20px; font-family: sans-serif; }
-        .gateway-container { max-width: 400px; margin: 50px auto; background: var(--card-bg); padding: 30px; border-radius: 20px; text-align: center; border: 1px solid var(--border-color); }
-        .app-container { display: none; }
-        .room-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
-        .room-card { background: var(--card-bg); padding: 15px; border: 1px solid var(--border-color); border-radius: 10px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #111827; border: 1px solid var(--border-color); color: white; border-radius: 8px; }
-        .main-btn { width: 100%; padding: 15px; background: var(--accent-green); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        .gateway-container { max-width: 400px; margin: 40px auto; background: var(--card-bg); padding: 30px; border-radius: 20px; border: 1px solid var(--border-color); text-align: center; }
+        .app-container { display: none; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+        
+        .room-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .room-card { background: var(--card-bg); padding: 20px; border: 1px solid var(--border-color); border-radius: 12px; cursor: pointer; text-align: center; }
+        .room-card:hover { border-color: var(--accent-green); }
+        
+        .sidebar { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111827; border: 1px solid var(--border-color); color: white; border-radius: 8px; }
+        .btn-action { width: 100%; padding: 15px; background: var(--accent-green); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="gateway-root" class="gateway-container">
         <h2>HOTEL CORDELIA</h2>
-        <input type="password" id="pin" placeholder="PIN 입력 (0220/0880)">
-        <button class="main-btn" onclick="login()">접속하기</button>
+        <button onclick="userMode='op'">운영</button>
+        <button onclick="userMode='admin'">관리자</button>
+        <input type="password" id="pin" placeholder="PIN 입력">
+        <button class="btn-action" onclick="login()">접속</button>
     </div>
 
     <div id="dashboard-app-root" class="app-container">
-        <h2>대시보드 (정상 복구 완료)</h2>
-        <div class="room-grid" id="room-list">
-            </div>
+        <div>
+            <h2>객실 현황</h2>
+            <div class="room-grid" id="room-list"></div>
+        </div>
+        <div class="sidebar">
+            <h3>객실 제어</h3>
+            <input type="text" id="phone" placeholder="연락처">
+            <button class="btn-action" onclick="checkIn()">입실 처리</button>
+        </div>
     </div>
 
     <script>
-        // 8개 객실 카드 생성
+        let userMode = 'op';
         const list = document.getElementById('room-list');
         for(let i=101; i<=108; i++) {
-            list.innerHTML += `<div class="room-card">${i}호<br>예약가능</div>`;
+            list.innerHTML += `<div class="room-card" onclick="alert('${i}호 선택됨')">${i}호<br>공실</div>`;
         }
 
         function login() {
             let pin = document.getElementById('pin').value;
             if(pin === '0220' || pin === '0880') {
                 document.getElementById('gateway-root').style.display = 'none';
-                document.getElementById('dashboard-app-root').style.display = 'block';
+                document.getElementById('dashboard-app-root').style.display = 'grid';
             } else {
                 alert('비밀번호 오류');
             }
         }
+        function checkIn() { alert('입실 처리되었습니다.'); }
     </script>
 </body>
 </html>
