@@ -66,6 +66,7 @@
         .bypass-btn {
             background: none; border: none; color: #9ca3af; font-size: 11px;
             text-decoration: underline; cursor: pointer; margin-top: 12px;
+            display: inline-block; width: 100%;
         }
 
         /* [2] 메인 레이아웃 및 최상단 탑 네비게이션 */
@@ -192,7 +193,7 @@
         .admin-view .method-btn.selected { background: #fef2f2; border-color: var(--accent-red); color: var(--accent-red); }
 
         /* 달력 배치 하우징 */
-        .embed-calendar-box { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; }
+        .embed-calendar-box { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; min-height: 250px; }
 
         /* 최종 요금 노출 박스 */
         .total-amount-display-card {
@@ -483,7 +484,7 @@
 
                 <div class="sidebar-element-box">
                     <div class="section-block-title" style="font-size:13px; margin-bottom:10px;">숙박 투숙 기간 설정 (달력 드래그)</div>
-                    <div class="embed-calendar-box">
+                    <div class="embed-calendar-box" id="calendar-box-housing">
                         <input type="text" id="flatpickr-embedded-core" style="display:none;">
                     </div>
                 </div>
@@ -533,7 +534,7 @@
         let currentSelectedPayMethod = 'card';
         let currentCalculatedPrice = 0;
 
-        // 8개 객실 확장 단가표 반영 (107호, 108호 가상 단가 수식)
+        // 8개 객실 독립 숙박 단가표
         const defaultRoomTariff = { 
             '101': 50000, '102': 50000, '103': 60000, '104': 55000, 
             '105': 55000, '106': 70000, '107': 65000, '108': 80000 
@@ -548,7 +549,7 @@
             document.getElementById('sys-auth-error').style.display = 'none';
         }
 
-        // 로그인 인증 수행 로직
+        // 패치 완료된 초고속 진입 인증 로직
         function executeLogin() {
             const codeInput = document.getElementById('sys-pincode').value.trim();
             const errAlert = document.getElementById('sys-auth-error');
@@ -562,17 +563,17 @@
             }
         }
 
-        // 엔터키 즉각 바인딩
-        document.getElementById('sys-pincode').addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') executeLogin();
-        });
-
-        // 우회 진입 브릿지 장치 (테스트용)
+        // 우회 진입 브릿지 장치
         function bypassDirectAuth() {
             initializeMainDashboard(currentGateViewMode);
         }
 
-        // 권한별 대시보드 화면 렌더링 및 UI 바인딩 트랙
+        // 엔터키 지원
+        document.getElementById('sys-pincode').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') executeLogin();
+        });
+
+        // 메인 대시보드 화면 전환 처리 (달력 로딩 지연 가드 장치 추가)
         function initializeMainDashboard(authRole) {
             document.getElementById('gateway-root').style.display = 'none';
             const appContainer = document.getElementById('dashboard-app-root');
@@ -596,8 +597,10 @@
                 document.querySelectorAll('.admin-only-block').forEach(el => el.style.display = 'none');
             }
 
-            // 고도화 캘린더 코어 상시 배치 구동
-            spinUpEmbeddedCalendar();
+            // 화면을 먼저 안전하게 연 뒤, 0.1초의 여유를 두고 달력 기능을 안전하게 스핀업합니다.
+            setTimeout(function() {
+                spinUpEmbeddedCalendar();
+            }, 100);
         }
 
         // 결제 수단 토글 처리 제어기
@@ -615,9 +618,8 @@
             document.getElementById(`room-${roomNum}`).classList.add('selected');
             document.getElementById('side-target-room-lbl').innerText = roomNum + "호";
             
-            // 데이터 무결성을 위해 객실 변경 시 달력 세션 데이터 초기 리셋
             const targetCal = document.getElementById('flatpickr-embedded-core');
-            if (targetCal._flatpickr) {
+            if (targetCal && targetCal._flatpickr) {
                 targetCal._flatpickr.clear();
                 document.getElementById('calc-nights-counter').innerText = "지정된 기간: 이용 기간 없음";
                 document.getElementById('calc-total-price-lbl').innerText = "숙박 총 요금: 0원";
@@ -625,7 +627,7 @@
             }
         }
 
-        // 가상 정산 확정 이벤트 처리기
+        // 정산 확정 이벤트 처리기
         function commitReservationFinal() {
             const phone = document.getElementById('form-phone-input').value;
             const payStatus = document.getElementById('form-pay-status').value;
@@ -640,60 +642,4 @@
                 return;
             }
 
-            alert(`${currentFocusedRoomNum}호 숙박 정산 처리 완료!\n총 요금: ${currentCalculatedPrice.toLocaleString()}원\n결제 상태: ${payStatus} (${currentSelectedPayMethod})\n정상 반영되었습니다.`);
-            
-            // 만약 결제완료 상태로 확정했다면 오늘 매출에 가산하는 트리거 연동
-            if (payStatus === '완료') {
-                document.getElementById('today-revenue-display').innerText = currentCalculatedPrice.toLocaleString() + " 원";
-            }
-        }
-
-        // 가상 세션 강제 종료 퇴실 트리거
-        function terminateSessionMock(roomNum) {
-            if (confirm(`${roomNum}호 투숙객을 퇴실 처리하고 정산 데이터로 마감 이관하시겠습니까?`)) {
-                alert("퇴실 처리가 수동 완료되었습니다. 객실 정비 대기 상태로 전환됩니다.");
-            }
-        }
-
-        // 드래그 전용 플랫피커 캘린더 엔진 스핀업 및 숙박 요금(박수) 실시간 수식 연동
-        function spinUpEmbeddedCalendar() {
-            flatpickr("#flatpickr-embedded-core", {
-                inline: true,             // 화면 고정형 인라인 레이아웃
-                mode: "range",            // 마우스 드래그 연동 범위 선택 활성화
-                locale: "ko",             // 한국어 패키지 적용
-                dateFormat: "Y-m-d",
-                minDate: "today",         // 역일 예약 휴먼에러 차단 장치
-                onChange: function(selectedDates, dateStr, instance) {
-                    const counterLbl = document.getElementById('calc-nights-counter');
-                    const priceLbl = document.getElementById('calc-total-price-lbl');
-                    
-                    if (selectedDates.length === 2) {
-                        const inDate = selectedDates[0];
-                        const outDate = selectedDates[1];
-                        
-                        // 타임스탬프 기반 일자 차이(박수) 연산
-                        const msDiff = Math.abs(outDate - inDate);
-                        const calculatedNights = Math.ceil(msDiff / (1000 * 60 * 60 * 24));
-                        const calculatedDays = calculatedNights + 1;
-                        
-                        // 현재 선택 타겟 객실 기본 숙박 요금 단가 로드하여 곱연산 정산 처리
-                        const roomUnitPrice = defaultRoomTariff[currentFocusedRoomNum] || 50000;
-                        currentCalculatedPrice = calculatedNights * roomUnitPrice;
-
-                        counterLbl.innerHTML = `선택 범위: <span style="color:#222;">${dateStr.replace("to", "~")}</span> [${calculatedNights}박 ${calculatedDays}일]`;
-                        priceLbl.innerText = `숙박 총 요금: ${currentCalculatedPrice.toLocaleString()}원`;
-                    } else if (selectedDates.length === 1) {
-                        counterLbl.innerText = "지정 중.. 체크아웃 날짜를 마저 클릭/드래그 하세요.";
-                        priceLbl.innerText = "숙박 요금: 계산 중";
-                        currentCalculatedPrice = 0;
-                    } else {
-                        counterLbl.innerText = "지정된 기간: 이용 기간 없음";
-                        priceLbl.innerText = "숙박 총 요금: 0원";
-                        currentCalculatedPrice = 0;
-                    }
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+            alert(`${currentFocusedRoomNum}호 숙박 정산 처리 완료!\n총
