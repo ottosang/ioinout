@@ -1,711 +1,83 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hotel Cordelia - 통합 관리 시스템</title>
+    <script>
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('cordelia_theme', 'dark');
+        if (window.location.search.indexOf('v=') === -1) {
+            window.location.replace(window.location.origin + window.location.pathname + '?v=' + new Date().getTime());
+        }
+    </script>
     <style>
-        :root {
-            /* 라이트모드 변수 */
-            --bg-main: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-dark: #222222;
-            --text-muted: #777777;
-            --border-color: #e5e7eb;
-            --accent-green: #656d4a; 
-            --accent-green-hover: #4f5539;
-            --accent-red: #b91c1c;
-            --status-bg-green: #f0fdf4;
-            --status-text-green: #16a34a;
-            --panel-header-bg: #f9fafb;
-        }
-
-        /* 다크모드 전용 변수 오버라이드 */
-        [data-theme="dark"] {
-            --bg-main: #111827;
-            --card-bg: #1f2937;
-            --text-dark: #f3f4f6;
-            --text-muted: #9ca3af;
-            --border-color: #374151;
-            --accent-green: #84cc16;
-            --accent-green-hover: #a3e635;
-            --status-bg-green: #064e3b;
-            --status-text-green: #34d399;
-            --panel-header-bg: #111827;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-dark);
-            padding: 12px;
-            min-height: 100vh;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        @media (min-width: 768px) { body { padding: 24px; } }
-
-        /* 게이트웨이 로그인 스타일 */
-        .gateway-container {
-            max-width: 400px;
-            margin: 40px auto;
-            background: var(--card-bg);
-            padding: 30px 20px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .gateway-header h1 { font-size: 22px; margin-bottom: 6px; letter-spacing: -0.5px; }
-        .gateway-header p { font-size: 13px; color: var(--text-muted); margin-bottom: 25px; }
-
-        .mode-btn-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        .mode-btn {
-            flex: 1; padding: 14px; border: 1px solid var(--border-color);
-            background: #f9fafb; border-radius: 8px; cursor: pointer;
-            font-weight: bold; font-size: 14px; color: #333; transition: all 0.2s;
-        }
-        [data-theme="dark"] .mode-btn { color: #fff; background: #374151; }
-        .mode-btn.active-op { background: var(--accent-green); color: white; border-color: var(--accent-green); }
-        .mode-btn.active-admin { background: var(--accent-red); color: white; border-color: var(--accent-red); }
-
-        .pin-box input {
-            width: 100%; padding: 14px; border: 1px solid var(--border-color);
-            border-radius: 8px; text-align: center; font-size: 18px;
-            letter-spacing: 4px; margin-bottom: 15px; background: var(--card-bg); color: var(--text-dark);
-        }
-        .error-msg { color: var(--accent-red); font-size: 12px; margin-bottom: 15px; display: none; }
+        :root { --bg-main: #111827; --card-bg: #1f2937; --text-dark: #f3f4f6; --text-muted: #9ca3af; --border-color: #374151; --accent-green: #84cc16; --accent-red: #ef4444; --status-bg-green: #064e3b; --status-text-green: #34d399; --panel-header-bg: #111827; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-dark); padding: 20px; min-height: 100vh; }
         
-        .bypass-btn {
-            background: none; border: none; color: var(--text-muted); font-size: 12px;
-            text-decoration: underline; cursor: pointer; margin-top: 14px;
-            display: inline-block; width: 100%;
-        }
-
-        /* 메인 레이아웃 및 상단 탑 바 */
-        .app-container { display: none; max-width: 1400px; margin: 0 auto; }
+        .gateway-container { max-width: 400px; margin: 50px auto; background: var(--card-bg); padding: 30px; border-radius: 20px; border: 1px solid var(--border-color); text-align: center; }
+        .app-container { display: none; max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+        @media (max-width: 1100px) { .app-container { grid-template-columns: 1fr; } }
         
-        .app-top-bar {
-            display: flex; flex-direction: column; gap: 12px;
-            background: var(--card-bg); padding: 16px; border-radius: 12px;
-            margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            border: 1px solid var(--border-color);
-        }
-        @media (min-width: 768px) {
-            .app-top-bar { flex-direction: row; justify-content: space-between; align-items: center; }
-        }
+        .room-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
+        .room-card { background: var(--card-bg); padding: 20px; border: 1px solid var(--border-color); border-radius: 12px; cursor: pointer; text-align: center; }
+        .room-card.selected { border-color: var(--accent-green); border-width: 2px; }
         
-        .brand-title h2 { font-size: 18px; font-weight: 700; }
-        .brand-title p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .sidebar { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111827; border: 1px solid var(--border-color); color: white; border-radius: 8px; }
+        .btn-action { width: 100%; padding: 15px; background: var(--accent-green); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: black; }
         
-        .top-bar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-        
-        .top-btn {
-            padding: 10px 14px; border: 1px solid var(--border-color);
-            background: var(--card-bg); color: var(--text-dark); border-radius: 6px; font-size: 13px; font-weight: 500;
-            cursor: pointer; flex: 1; min-width: 80px; text-align: center;
-        }
-        @media (min-width: 768px) { .top-btn { flex: none; } }
-        .top-btn:hover { background: #f3f4f6; }
-        [data-theme="dark"] .top-btn:hover { background: #374151; }
-
-        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; display: inline-block; text-align: center; }
-        .badge-op { background-color: var(--accent-green); }
-        .badge-admin { background-color: var(--accent-red); }
-
-        .theme-switch-btn {
-            background: #e5e7eb; color: #374151; border: none; font-weight: bold;
-        }
-        [data-theme="dark"] .theme-switch-btn { background: #374151; color: #fbbf24; }
-
-        /* 지표 요약 카드 레이아웃 */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px; margin-bottom: 16px;
-        }
-        @media (min-width: 900px) {
-            .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
-        }
-        
-        .stats-card {
-            background: var(--card-bg); padding: 14px; border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-        .stats-card .stats-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-        .stats-card .stats-value { font-size: 20px; font-weight: 800; margin: 4px 0; }
-        @media (min-width: 768px) { .stats-card .stats-value { font-size: 26px; } }
-        .stats-card .stats-desc { font-size: 10px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* 오류 완치 수동 배치 레이아웃 (모바일과 PC 모두 절대 안 사라지도록 구조 결합) */
-        .dashboard-body-layout {
-            display: flex; flex-direction: column; gap: 16px; width: 100%;
-        }
-        @media (min-width: 1100px) {
-            .dashboard-body-layout { display: grid; grid-template-columns: 1fr 380px; gap: 16px; }
-        }
-
-        /* 순서(order) 강제 통일 및 제거하여 미노출 원인 차단 */
-        .left-main-stream { display: flex; flex-direction: column; gap: 16px; width: 100%; }
-        .right-control-sidebar { display: flex; flex-direction: column; gap: 16px; width: 100%; }
-
-        .panel-container {
-            background: var(--card-bg); padding: 16px; border-radius: 12px;
-            border: 1px solid var(--border-color); width: 100%;
-        }
-        @media (min-width: 768px) { .panel-container { padding: 24px; } }
-
-        .panel-header-title {
-            font-size: 15px; font-weight: 700; margin-bottom: 16px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        /* 객실 카드 그리드 균형 패치 */
-        .room-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            width: 100%;
-        }
-        @media (min-width: 550px) {
-            .room-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        }
-        @media (min-width: 768px) {
-            .room-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
-        }
-        
-        .room-card {
-            border: 1px solid var(--border-color); border-radius: 12px;
-            padding: 14px; background: var(--card-bg); cursor: pointer;
-            transition: all 0.2s; position: relative; width: 100%;
-        }
-        
-        .room-card:hover, .room-card.selected {
-            border-color: var(--accent-green); box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-        }
-        .admin-view .room-card:hover, .admin-view .room-card.selected { border-color: var(--accent-red); }
-
-        .room-card .room-title-num { font-size: 18px; font-weight: 800; }
-        @media (min-width: 768px) { .room-card .room-title-num { font-size: 22px; } }
-
-        .room-card .status-tag {
-            position: absolute; top: 14px; right: 14px; font-size: 10px;
-            padding: 2px 6px; border-radius: 4px; background: #f3f4f6; color: #555; font-weight: 600;
-        }
-        [data-theme="dark"] .room-card .status-tag { background: #374151; color: #ccc; }
-        
-        .room-card.in-use { background: var(--status-bg-green); border-color: #cbd5e1; }
-        [data-theme="dark"] .room-card.in-use { border-color: #047857; }
-        .room-card.in-use .status-tag { background: #16a34a; color: white; }
-        
-        .room-card.cleaning { background: #fffbeb; border-color: #fde68a; }
-        [data-theme="dark"] .room-card.cleaning { background: #451a03; border-color: #78350f; }
-        .room-card.cleaning .status-tag { background: #d97706; color: white; }
-
-        .room-info-list { font-size: 12px; margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
-        .room-info-list div { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 2px; }
-        .room-info-list div span:first-child { color: var(--text-muted); }
-        .room-info-list div span:last-child { font-weight: 600; }
-
-        .card-inner-actions { display: flex; gap: 4px; margin-top: 12px; }
-        .inner-btn {
-            flex: 1; padding: 6px; font-size: 11px; font-weight: 500;
-            border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-dark); border-radius: 6px; cursor: pointer;
-        }
-
-        /* 테이블 모바일 터치 패치 */
-        .data-table-wrapper { width: 100%; overflow-x: auto; margin-top: 6px; -webkit-overflow-scrolling: touch; }
-        .base-data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; min-width: 550px; }
-        .base-data-table th { background: var(--panel-header-bg); padding: 10px; font-weight: 600; border-bottom: 2px solid var(--border-color); color: var(--text-dark); }
-        .base-data-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-color); color: var(--text-dark); }
-        .table-btn-end { padding: 6px 10px; border: 1px solid #fee2e2; background: #fef2f2; color: #b91c1c; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        [data-theme="dark"] .table-btn-end { background: #7f1d1d; border-color: #991b1b; color: #fca5a5; }
-
-        .section-block-title { font-size: 14px; font-weight: 700; padding-bottom: 6px; border-bottom: 2px solid var(--border-color); }
-        .focus-room-title { font-size: 24px; font-weight: 800; color: var(--accent-green); }
-
-        .form-row { margin-bottom: 10px; }
-        .form-row label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
-        .form-row input, .form-row select { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; background: var(--bg-main); color: var(--text-dark); }
-        
-        .pay-method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 4px; }
-        .method-btn {
-            padding: 10px 6px; font-size: 12px; font-weight: bold; border: 1px solid var(--border-color);
-            background: var(--card-bg); color: var(--text-dark); border-radius: 6px; cursor: pointer; text-align: center;
-        }
-        .method-btn.selected { background: #f5f6f2; border-color: var(--accent-green); color: var(--accent-green); }
-        [data-theme="dark"] .method-btn.selected { background: #374151; border-color: var(--accent-green); color: var(--accent-green); }
-
-        /* 달력 하우징 */
-        .native-cal-box {
-            display: flex; flex-direction: column; gap: 6px; background: var(--bg-main); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);
-        }
-        @media (min-width: 360px) { .native-cal-box { flex-direction: row; align-items: center; } }
-        .native-cal-box input { flex: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-dark); text-align: center; width: 100%; }
-
-        .total-amount-display-card {
-            background: var(--bg-main); border: 1px solid var(--border-color); padding: 12px;
-            border-radius: 8px; text-align: center; margin-top: 4px;
-        }
-        .total-amount-display-card .amt-label { font-size: 11px; color: var(--text-muted); }
-        .total-amount-display-card .amt-val { font-size: 20px; font-weight: 800; margin-top: 2px; }
-
-        .submit-large-btn {
-            width: 100%; padding: 16px; background: var(--accent-green); color: white;
-            border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;
-        }
-        .submit-large-btn:hover { background: var(--accent-green-hover); }
-        .admin-view .submit-large-btn { background: var(--accent-red); }
-
-        .term-info-desc { font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.4; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { padding: 12px; border-bottom: 1px solid var(--border-color); text-align: left; }
     </style>
 </head>
 <body>
 
     <div id="gateway-root" class="gateway-container">
-        <div class="gateway-header">
-            <h1>HOTEL CORDELIA</h1>
-            <p>객실 및 시설 통합 관리 시스템</p>
+        <h2>HOTEL CORDELIA</h2>
+        <div style="margin:20px 0;">
+            <button onclick="userMode='op'; this.style.background='var(--accent-green)'" style="padding:10px; background:var(--accent-green)">운영</button>
+            <button onclick="userMode='admin'; this.style.background='var(--accent-red)'" style="padding:10px; background:#374151">관리자</button>
         </div>
-        
-        <div class="mode-btn-group">
-            <button id="gate-op-btn" class="mode-btn active-op" onclick="toggleGateTab('op')">운영 화면</button>
-            <button id="gate-admin-btn" class="mode-btn" onclick="toggleGateTab('admin')">관리자 대시보드</button>
-        </div>
-
-        <div class="pin-box">
-            <input type="password" id="sys-pincode" placeholder="PIN 번호 입력" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off">
-            <div id="sys-auth-error" class="error-msg">비밀번호 불일치 (운영:0220 / 관리자:0880)</div>
-        </div>
-
-        <button class="submit-large-btn" style="padding:14px;" onclick="executeLogin()">시스템 안전 접속</button>
-        <button class="bypass-btn" onclick="bypassDirectAuth()">[보안 우회하여 대시보드 즉시 확인]</button>
+        <input type="password" id="pin" placeholder="PIN 입력 (0220/0880)">
+        <button class="btn-action" onclick="login()">접속하기</button>
     </div>
 
-
     <div id="dashboard-app-root" class="app-container">
-        
-        <div class="app-top-bar">
-            <div class="brand-title">
-                <h2>객실 및 투숙 관리 시스템</h2>
-                <p>투숙객 입실 처리, 실시간 예약 현황 관리 및 객실 정산을 제어합니다.</p>
-            </div>
-            <div class="top-bar-actions">
-                <button class="top-btn theme-switch-btn" onclick="toggleNativeThemeMode()">🌓 다크모드 토글</button>
-                <button class="top-btn" onclick="location.reload();">🔄 새로고침</button>
-                <button class="top-btn" style="color:var(--accent-red);" onclick="clearAllSystemData()">🔄 초기화</button>
-                <span id="authority-badge" class="badge badge-op">운영 모드</span>
-            </div>
+        <div>
+            <h2>객실 현황</h2>
+            <div class="room-grid" id="room-list"></div>
+            <h3>투숙/정산 내역</h3>
+            <table><thead><tr><th>객실</th><th>연락처</th><th>상태</th></tr></thead><tbody id="table"></tbody></table>
         </div>
-
-        <div class="stats-grid">
-            <div class="stats-card">
-                <div class="stats-label">재실/운영중</div>
-                <div class="stats-value" id="stat-in-use-lbl" style="color: #16a34a;">0 실</div>
-                <div class="stats-desc">현재 투숙 중 객실</div>
-            </div>
-            <div class="stats-card">
-                <div class="stats-label">예약가능 (공실)</div>
-                <div class="stats-value" id="stat-avail-lbl" style="color: var(--text-dark);">8 실</div>
-                <div class="stats-desc">배정 가능한 공실</div>
-            </div>
-            <div class="stats-card">
-                <div class="stats-label">정비/점검 필요</div>
-                <div class="stats-value" id="stat-cleaning-lbl" style="color: #d97706;">0 실</div>
-                <div class="stats-desc">청소 점검 중 상태</div>
-            </div>
-            <div class="stats-card">
-                <div class="stats-label">오늘 정산 매출</div>
-                <div class="stats-value" id="today-revenue-display">0 원</div>
-                <div class="stats-desc">금일 누적 완료 금액</div>
-            </div>
-        </div>
-
-        <div class="dashboard-body-layout" id="style-visual-root">
-            
-            <div class="left-main-stream">
-                <div class="panel-container">
-                    <div class="panel-header-title">
-                        <span>객실 투숙 현황</span>
-                        <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">총 8개 객실</span>
-                    </div>
-                    <div class="room-grid" id="main-room-grid-housing">
-                        </div>
-                </div>
-
-                <div class="panel-container">
-                    <div class="panel-header-title"><span>현재 투숙/이용 중 객실 명단</span></div>
-                    <div class="data-table-wrapper">
-                        <table class="base-data-table">
-                            <thead><tr><th>객실</th><th>고객 연락처</th><th>단위</th><th>상태</th><th>투숙 기간</th><th>관리</th></tr></thead>
-                            <tbody id="live-occupant-table-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="panel-container">
-                    <div class="panel-header-title"><span>최근 퇴실 및 정산 마감 내역</span></div>
-                    <div class="data-table-wrapper">
-                        <table class="base-data-table">
-                            <thead><tr><th>객실</th><th>연락처</th><th>투숙 기간</th><th>정산 금액</th><th>수단</th><th>상태</th></tr></thead>
-                            <tbody id="history-billing-table-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="right-control-sidebar">
-                <div class="form-row">
-                    <div class="section-block-title">선택 객실 제어</div>
-                    <div class="focus-room-title" id="side-target-room-lbl">101호</div>
-                </div>
-
-                <div class="form-row">
-                    <label>고객 연락처</label>
-                    <input type="tel" id="form-phone-input" placeholder="01012345678" inputmode="tel">
-                </div>
-                <div class="form-row">
-                    <label>객실 메모 사항</label>
-                    <input type="text" id="form-memo-input" placeholder="요구사항 기입">
-                </div>
-
-                <div class="form-row">
-                    <label style="font-weight:bold;">투숙 기간 지정 (체크인 / 체크아웃)</label>
-                    <div class="native-cal-box">
-                        <input type="date" id="cal-checkin" onchange="calculateLodgingBill()">
-                        <span style="align-self:center;font-weight:bold;">~</span>
-                        <input type="date" id="calcheckout" onchange="calculateLodgingBill()">
-                    </div>
-                </div>
-
-                <div class="form-row" style="background:var(--card-bg); padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-                    <label>결제 상태 및 수단</label>
-                    <select id="form-pay-status" style="margin-bottom:10px; background:var(--bg-main); color:var(--text-dark);">
-                        <option value="완료">✅ 정산 및 결제 완료 (매출 즉시 합산)</option>
-                        <option value="미결제" selected>⚠️ 미결제 (현장 후불 정산)</option>
-                    </select>
-                    <div class="pay-method-grid">
-                        <button class="method-btn selected" id="m-card" onclick="setPayMethod('card')">신용카드</button>
-                        <button class="method-btn" id="m-cash" onclick="setPayMethod('cash')">현금정산</button>
-                        <button class="method-btn" id="m-room" onclick="setPayMethod('room')">객실차지</button>
-                    </div>
-
-                    <div class="total-amount-display-card">
-                        <div class="amt-label" id="calc-nights-counter">이용 기간: 날짜를 선택해 주세요</div>
-                        <div class="amt-val" id="calc-total-price-lbl">숙박 총 요금: 0원</div>
-                    </div>
-                </div>
-
-                <button class="submit-large-btn" id="side-main-submit-action" onclick="commitReservationFinal()">입실 처리 및 예약 확정</button>
-            </div>
-
+        <div class="sidebar">
+            <h3>객실 제어</h3>
+            <div id="target">101호 선택됨</div>
+            <input type="text" id="phone" placeholder="연락처">
+            <button class="btn-action" onclick="checkIn()">입실 처리</button>
         </div>
     </div>
 
     <script>
-        let currentGateMode = 'op';
-        let currentRoom = '101';
-        let currentMethod = 'card';
-        let finalPrice = 0;
-        let currentRoleCtx = 'op';
+        let selected = 101;
+        const list = document.getElementById('room-list');
+        const table = document.getElementById('table');
 
-        const roomRates = { '101': 50000, '102': 50000, '103': 60000, '104': 55000, '105': 55000, '106': 70000, '107': 65000, '108': 80000 };
-
-        let systemState = {
-            rooms: {
-                '101': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 },
-                '102': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 },
-                '103': { status: 'in-use', phone: '010-****-0220', memo: '기본 세션 고정', period: '일 단위 대기', price: 0 },
-                '104': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 },
-                '105': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 },
-                '106': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 },
-                '107': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 },
-                '108': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 }
-            },
-            history: [],
-            todayRevenue: 0
-        };
-
-        if (localStorage.getItem('cordelia_sys_state')) {
-            systemState = JSON.parse(localStorage.getItem('cordelia_sys_state'));
+        for(let i=101; i<=108; i++) {
+            list.innerHTML += `<div class="room-card" onclick="selected=${i}; document.getElementById('target').innerText='${i}호 선택됨'"> ${i}호<br>공실</div>`;
         }
 
-        const savedTheme = localStorage.getItem('cordelia_theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-
-        function toggleNativeThemeMode() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('cordelia_theme', newTheme);
+        function login() {
+            if(document.getElementById('pin').value === '0220' || document.getElementById('pin').value === '0880') {
+                document.getElementById('gateway-root').style.display = 'none';
+                document.getElementById('dashboard-app-root').style.display = 'grid';
+            } else { alert('비밀번호 오류'); }
         }
 
-        function saveStateToStorage() {
-            localStorage.setItem('cordelia_sys_state', JSON.stringify(systemState));
-        }
-
-        function toggleGateTab(mode) {
-            currentGateMode = mode;
-            document.getElementById('gate-op-btn').className = mode === 'op' ? 'mode-btn active-op' : 'mode-btn';
-            document.getElementById('gate-admin-btn').className = mode === 'admin' ? 'mode-btn active-admin' : 'mode-btn';
-            document.getElementById('sys-pincode').value = '';
-            document.getElementById('sys-auth-error').style.display = 'none';
-        }
-
-        function executeLogin() {
-            const pin = document.getElementById('sys-pincode').value.trim();
-            if (currentGateMode === 'op' && pin === '0220') { openDashboard('op'); } 
-            else if (currentGateMode === 'admin' && pin === '0880') { openDashboard('admin'); } 
-            else { document.getElementById('sys-auth-error').style.display = 'block'; }
-        }
-
-        function bypassDirectAuth() { openDashboard(currentGateMode); }
-
-        function openDashboard(role) {
-            currentRoleCtx = role;
-            document.getElementById('gateway-root').style.display = 'none';
-            document.getElementById('dashboard-app-root').style.display = 'block';
-            
-            const vRoot = document.getElementById('style-visual-root');
-            const badge = document.getElementById('authority-badge');
-
-            if (role === 'admin') {
-                vRoot.className = 'dashboard-body-layout admin-view';
-                badge.className = 'badge badge-admin'; badge.innerText = '관리자 모드';
-            } else {
-                vRoot.className = 'dashboard-body-layout';
-                badge.className = 'badge badge-op'; badge.innerText = '운영 모드';
-            }
-            
-            const todayStr = new Date().toISOString().split('T')[0];
-            document.getElementById('cal-checkin').min = todayStr;
-            document.getElementById('calcheckout').min = todayStr;
-
-            refreshCoreDashboardUI();
-        }
-
-        function refreshCoreDashboardUI() {
-            const gridHousing = document.getElementById('main-room-grid-housing');
-            gridHousing.innerHTML = '';
-
-            let inUseCount = 0;
-            let cleaningCount = 0;
-            let availCount = 0;
-
-            Object.keys(systemState.rooms).forEach(rm => {
-                const roomData = systemState.rooms[rm];
-                let statusText = '예약가능';
-                let statusClass = '';
-
-                if (roomData.status === 'in-use') {
-                    statusText = '이용중'; statusClass = 'in-use'; inUseCount++;
-                } else if (roomData.status === 'cleaning') {
-                    statusText = '정비중'; statusClass = 'cleaning'; cleaningCount++;
-                } else {
-                    availCount++;
-                }
-
-                const isSelected = (rm === currentRoom) ? 'selected' : '';
-                const adminControlBlock = (currentRoleCtx === 'admin') ? 
-                    `<div class="card-inner-actions">
-                        <button class="inner-btn" onclick="event.stopPropagation(); forceChangeRoomStatus('${rm}', 'available')">공실화</button>
-                        <button class="inner-btn" onclick="event.stopPropagation(); forceChangeRoomStatus('${rm}', 'cleaning')">정비</button>
-                     </div>` : '';
-
-                const cardHtml = `
-                    <div class="room-card ${statusClass} ${isSelected}" id="room-${rm}" onclick="focusActiveRoom('${rm}')">
-                        <div class="room-title-num">${rm}호</div>
-                        <span class="status-tag">${statusText}</span>
-                        <div class="room-info-list">
-                            <div><span>투숙 기간</span><span>${roomData.period}</span></div>
-                            <div><span>연락처</span><span>${roomData.phone}</span></div>
-                            <div><span>요금</span><span>${roomData.price.toLocaleString()}원</span></div>
-                        </div>
-                        ${adminControlBlock}
-                    </div>
-                `;
-                gridHousing.innerHTML += cardHtml;
-            });
-
-            document.getElementById('stat-in-use-lbl').innerText = inUseCount + " 실";
-            document.getElementById('stat-avail-lbl').innerText = availCount + " 실";
-            document.getElementById('stat-cleaning-lbl').innerText = cleaningCount + " 실";
-            document.getElementById('today-revenue-display').innerText = systemState.todayRevenue.toLocaleString() + " 원";
-
-            const tableBody = document.getElementById('live-occupant-table-body');
-            tableBody.innerHTML = '';
-            
-            let hasLive = false;
-            Object.keys(systemState.rooms).forEach(rm => {
-                const roomData = systemState.rooms[rm];
-                if (roomData.status === 'in-use') {
-                    hasLive = true;
-                    const rowHtml = `
-                        <tr>
-                            <td style="font-weight:bold;">${rm}호</td>
-                            <td>${roomData.phone}</td>
-                            <td>일 단위</td>
-                            <td style="color:var(--status-text-green); font-weight:bold;">투숙중</td>
-                            <td>${roomData.period}</td>
-                            <td><button class="table-btn-end" onclick="checkoutRoomSession('${rm}')">퇴실/마감</button></td>
-                        </tr>
-                    `;
-                    tableBody.innerHTML += rowHtml;
-                }
-            });
-            if (!hasLive) {
-                tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999; padding:16px;">현재 투숙 중인 객실이 없습니다.</td></tr>`;
-            }
-
-            const historyBody = document.getElementById('history-billing-table-body');
-            historyBody.innerHTML = '';
-            if (systemState.history.length === 0) {
-                historyBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999; padding:16px;">금일 정산 마감 내역이 없습니다.</td></tr>`;
-            } else {
-                systemState.history.forEach(item => {
-                    const rowHtml = `
-                        <tr>
-                            <td style="font-weight:bold;">${item.room}호</td>
-                            <td>${item.phone}</td>
-                            <td>${item.period}</td>
-                            <td style="font-weight:bold;">${item.price.toLocaleString()}원</td>
-                            <td>${item.method.toUpperCase()}</td>
-                            <td style="color:var(--status-text-green); font-weight:bold;">${item.payStatus}</td>
-                        </tr>
-                    `;
-                    historyBody.innerHTML += rowHtml;
-                });
-            }
-        }
-
-        function setPayMethod(m) {
-            currentMethod = m;
-            document.getElementById('m-card').className = m === 'card' ? 'method-btn selected' : 'method-btn';
-            document.getElementById('m-cash').className = m === 'cash' ? 'method-btn selected' : 'method-btn';
-            document.getElementById('m-room').className = m === 'room' ? 'method-btn selected' : 'method-btn';
-        }
-
-        function focusActiveRoom(rm) {
-            currentRoom = rm;
-            document.getElementById('side-target-room-lbl').innerText = rm + "호";
-            
-            document.getElementById('form-phone-input').value = '';
-            document.getElementById('form-memo-input').value = '';
-            document.getElementById('cal-checkin').value = '';
-            document.getElementById('calcheckout').value = '';
-            document.getElementById('calc-nights-counter').innerText = "이용 기간: 날짜를 선택해 주세요";
-            document.getElementById('calc-total-price-lbl').innerText = "숙박 총 요금: 0원";
-            finalPrice = 0;
-
-            refreshCoreDashboardUI();
-        }
-
-        function calculateLodgingBill() {
-            const cin = document.getElementById('cal-checkin').value;
-            const cout = document.getElementById('calcheckout').value;
-            const cntLbl = document.getElementById('calc-nights-counter');
-            const prcLbl = document.getElementById('calc-total-price-lbl');
-
-            if (cin && cout) {
-                const d1 = new Date(cin);
-                const d2 = new Date(cout);
-                
-                if (d2 <= d1) {
-                    cntLbl.innerText = "⚠️ 퇴실일 지정 에러";
-                    prcLbl.innerText = "총 요금: 계산 불가";
-                    finalPrice = 0; return;
-                }
-
-                const diff = Math.abs(d2 - d1);
-                const nights = Math.ceil(diff / (1000 * 60 * 60 * 24));
-                
-                const rate = roomRates[currentRoom] || 50000;
-                finalPrice = nights * rate;
-
-                cntLbl.innerHTML = `${nights}박 지정됨 (${cin} ~ ${cout})`;
-                prcLbl.innerText = `숙박 총 요금: ${finalPrice.toLocaleString()}원`;
-            }
-        }
-
-        function commitReservationFinal() {
-            const phone = document.getElementById('form-phone-input').value.trim();
-            const memo = document.getElementById('form-memo-input').value.trim() || '-';
-            const cin = document.getElementById('cal-checkin').value;
-            const cout = document.getElementById('calcheckout').value;
-            const payStat = document.getElementById('form-pay-status').value;
-
-            if (!phone) { alert("고객 연락처를 입력해 주세요."); return; }
-            if (finalPrice === 0) { alert("투숙 일정을 정확히 지정해 주세요."); return; }
-
-            systemState.rooms[currentRoom] = {
-                status: 'in-use',
-                phone: phone,
-                memo: memo,
-                period: `${cin} ~ ${cout}`,
-                price: finalPrice
-            };
-
-            if (payStat === '완료') {
-                systemState.todayRevenue += finalPrice;
-                systemState.history.unshift({
-                    room: currentRoom,
-                    phone: phone,
-                    period: `${cin} ~ ${cout}`,
-                    price: finalPrice,
-                    method: currentMethod,
-                    payStatus: '정산완료'
-                });
-            }
-
-            saveStateToStorage();
-            refreshCoreDashboardUI();
-
-            alert(`${currentRoom}호 체크인이 완료되었습니다!`);
-        }
-
-        function checkoutRoomSession(rm) {
-            const target = systemState.rooms[rm];
-            if (!target) return;
-
-            if (confirm(`${rm}호를 정산 마감하고 퇴실(정비 전환) 조치하시겠습니까?`)) {
-                const alreadyInHistory = systemState.history.some(h => h.room === rm && h.period === target.period);
-                if (!alreadyInHistory) {
-                    systemState.history.unshift({
-                        room: rm,
-                        phone: target.phone,
-                        period: target.period,
-                        price: target.price,
-                        method: '현장정산',
-                        payStatus: '후불마감'
-                    });
-                    systemState.todayRevenue += target.price;
-                }
-
-                systemState.rooms[rm] = { status: 'cleaning', phone: '-', memo: '-', period: '-', price: 0 };
-                
-                saveStateToStorage();
-                refreshCoreDashboardUI();
-            }
-        }
-
-        function forceChangeRoomStatus(rm, nextStatus) {
-            systemState.rooms[rm] = { status: nextStatus, phone: '-', memo: '-', period: '-', price: 0 };
-            saveStateToStorage();
-            refreshCoreDashboardUI();
-        }
-
-        function clearAllSystemData() {
-            if (confirm("🚨 시스템의 모든 보존 데이터를 삭제하고 초기화하시겠습니까?")) {
-                localStorage.removeItem('cordelia_sys_state');
-                location.reload();
-            }
+        function checkIn() {
+            table.innerHTML += `<tr><td>${selected}호</td><td>${document.getElementById('phone').value}</td><td>입실중</td></tr>`;
+            alert(selected + '호 입실 처리 완료');
         }
     </script>
 </body>
