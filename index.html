@@ -66,6 +66,7 @@
         .bypass-btn {
             background: none; border: none; color: #9ca3af; font-size: 11px;
             text-decoration: underline; cursor: pointer; margin-top: 12px;
+            display: inline-block; width: 100%;
         }
 
         /* [2] 메인 레이아웃 및 최상단 탑 네비게이션 */
@@ -192,7 +193,7 @@
         .admin-view .method-btn.selected { background: #fef2f2; border-color: var(--accent-red); color: var(--accent-red); }
 
         /* 달력 배치 하우징 */
-        .embed-calendar-box { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; }
+        .embed-calendar-box { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; min-height: 250px; }
 
         /* 최종 요금 노출 박스 */
         .total-amount-display-card {
@@ -350,3 +351,295 @@
                                 <div><span>숙박 요금</span><span>0원</span></div>
                             </div>
                             <div class="card-inner-actions admin-only-block">
+                                <button class="inner-btn">공실 전환</button>
+                                <button class="inner-btn">정비중 지정</button>
+                            </div>
+                        </div>
+
+                        <div class="room-card" id="room-106" onclick="focusActiveRoom('106')">
+                            <div class="room-title-num">106호</div>
+                            <span class="status-tag">예약가능</span>
+                            <div class="room-info-list">
+                                <div><span>투숙 기간</span><span>-</span></div>
+                                <div><span>연락처</span><span>-</span></div>
+                                <div><span>숙박 요금</span><span>0원</span></div>
+                            </div>
+                            <div class="card-inner-actions admin-only-block">
+                                <button class="inner-btn">공실 전환</button>
+                                <button class="inner-btn">정비중 지정</button>
+                            </div>
+                        </div>
+
+                        <div class="room-card" id="room-107" onclick="focusActiveRoom('107')">
+                            <div class="room-title-num">107호</div>
+                            <span class="status-tag">예약가능</span>
+                            <div class="room-info-list">
+                                <div><span>투숙 기간</span><span>-</span></div>
+                                <div><span>연락처</span><span>-</span></div>
+                                <div><span>숙박 요금</span><span>0원</span></div>
+                            </div>
+                            <div class="card-inner-actions admin-only-block">
+                                <button class="inner-btn">공실 전환</button>
+                                <button class="inner-btn">정비중 지정</button>
+                            </div>
+                        </div>
+
+                        <div class="room-card" id="room-108" onclick="focusActiveRoom('108')">
+                            <div class="room-title-num">108호</div>
+                            <span class="status-tag">예약가능</span>
+                            <div class="room-info-list">
+                                <div><span>투숙 기간</span><span>-</span></div>
+                                <div><span>연락처</span><span>-</span></div>
+                                <div><span>숙박 요금</span><span>0원</span></div>
+                            </div>
+                            <div class="card-inner-actions admin-only-block">
+                                <button class="inner-btn">공실 전환</button>
+                                <button class="inner-btn">정비중 지정</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="panel-container">
+                    <div class="panel-header-title">
+                        <span>현재 투숙/이용 중 객실 명단</span>
+                        <span style="font-size:12px; font-weight:bold; background:#edf2f7; padding:2px 8px; border-radius:4px;">1건 활성</span>
+                    </div>
+                    <div class="data-table-wrapper">
+                        <table class="base-data-table">
+                            <thead>
+                                <tr>
+                                    <th>객실 배정</th>
+                                    <th>고객 연락처</th>
+                                    <th>설정 단위</th>
+                                    <th>상태</th>
+                                    <th>종료 및 퇴실 예정일</th>
+                                    <th style="text-align:center;">관리 제어</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight:bold;">103호</td>
+                                    <td>010-****-0220</td>
+                                    <td>일 단위(Daily)</td>
+                                    <td style="color:var(--status-text-green); font-weight:bold;">재실 투숙 중</td>
+                                    <td>당일 현장 정산 및 확정 예정</td>
+                                    <td style="text-align:center;"><button class="table-btn-end" onclick="terminateSessionMock('103')">퇴실 처리</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel-container">
+                    <div class="panel-header-title">
+                        <span>최근 퇴실 및 정산 처리 내역</span>
+                        <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">최근 1건</span>
+                    </div>
+                    <div class="data-table-wrapper">
+                        <table class="base-data-table">
+                            <thead>
+                                <tr>
+                                    <th>객실</th>
+                                    <th>연락처</th>
+                                    <th>투숙 기간</th>
+                                    <th>정산 금액</th>
+                                    <th>마감 처리 시각</th>
+                                    <th>담당 처리자</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>101호</td>
+                                    <td>-</td>
+                                    <td>일 단위 정산</td>
+                                    <td style="font-weight:bold;">0원</td>
+                                    <td>05. 31. 오후 04:52</td>
+                                    <td><span style="color:#666;">현장 마스터(Admin)</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="right-control-sidebar">
+                <div class="sidebar-element-box">
+                    <div class="section-block-title" style="margin-bottom:10px;">선택 객실 제어</div>
+                    <div class="focus-room-title" id="side-target-room-lbl">101호</div>
+                </div>
+
+                <div class="sidebar-element-box">
+                    <div class="form-row">
+                        <label>고객 연락처 (숫자만 입력)</label>
+                        <input type="text" id="form-phone-input" placeholder="01012345678" value="">
+                    </div>
+                    <div class="form-row">
+                        <label>객실 메모 및 투숙 요구사항</label>
+                        <input type="text" id="form-memo-input" placeholder="조식 여부, 침구 추가 등 특이사항 기입">
+                    </div>
+                </div>
+
+                <div class="sidebar-element-box">
+                    <div class="section-block-title" style="font-size:13px; margin-bottom:10px;">숙박 투숙 기간 설정 (달력 드래그)</div>
+                    <div class="embed-calendar-box" id="calendar-box-housing">
+                        <input type="text" id="flatpickr-embedded-core" style="display:none;">
+                    </div>
+                </div>
+
+                <div class="sidebar-element-box" style="background: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+                    <div class="section-block-title" style="font-size:13px; border-bottom:none; padding-bottom:0; margin-bottom:8px;">정산 및 결제 수단 수동 지정</div>
+                    
+                    <div class="form-row">
+                        <label>결제 상태 설정</label>
+                        <select id="form-pay-status">
+                            <option value="완료">✅ 결제 및 정산 완료</option>
+                            <option value="미결제" selected>⚠️ 미결제 (현장 후불/체크아웃 정산)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <label>결제 수단 지정</label>
+                        <div class="pay-method-grid">
+                            <button class="method-btn selected" id="m-card" onclick="setPayMethod('card')">신용카드</button>
+                            <button class="method-btn" id="m-cash" onclick="setPayMethod('cash')">현금정산</button>
+                            <button class="method-btn" id="m-room" onclick="setPayMethod('room')">객실 차지</button>
+                        </div>
+                    </div>
+
+                    <div class="total-amount-display-card">
+                        <div class="amt-label" id="calc-nights-counter">지정된 기간: 이용 기간 없음</div>
+                        <div class="amt-val" id="calc-total-price-lbl">숙박 총 요금: 0원</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-element-box">
+                    <button class="submit-large-btn" id="side-main-submit-action" onclick="commitReservationFinal()">입실 처리 및 예약 확정</button>
+                    <div class="term-info-desc" style="margin-top:12px;">
+                        [숙박업 정산 가이드] 기간 지정 및 정산 확정 시 메인 매출 스태츠와 테이블에 데이터가 실시간으로 안전하게 연동됩니다.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+    <script>
+        let currentGateViewMode = 'op'; // 'op' 또는 'admin'
+        let currentFocusedRoomNum = '101';
+        let currentSelectedPayMethod = 'card';
+        let currentCalculatedPrice = 0;
+
+        // 8개 객실 독립 숙박 단가표
+        const defaultRoomTariff = { 
+            '101': 50000, '102': 50000, '103': 60000, '104': 55000, 
+            '105': 55000, '106': 70000, '107': 65000, '108': 80000 
+        };
+
+        // 게이트웨이 화면 보안 탭 전환
+        function toggleGateTab(targetMode) {
+            currentGateViewMode = targetMode;
+            document.getElementById('gate-op-btn').className = targetMode === 'op' ? 'mode-btn active-op' : 'mode-btn';
+            document.getElementById('gate-admin-btn').className = targetMode === 'admin' ? 'mode-btn active-admin' : 'mode-btn';
+            document.getElementById('sys-pincode').value = '';
+            document.getElementById('sys-auth-error').style.display = 'none';
+        }
+
+        // 패치 완료된 초고속 진입 인증 로직
+        function executeLogin() {
+            const codeInput = document.getElementById('sys-pincode').value.trim();
+            const errAlert = document.getElementById('sys-auth-error');
+
+            if (currentGateViewMode === 'op' && codeInput === '0220') {
+                initializeMainDashboard('op');
+            } else if (currentGateViewMode === 'admin' && codeInput === '0880') {
+                initializeMainDashboard('admin');
+            } else {
+                errAlert.style.display = 'block';
+            }
+        }
+
+        // 우회 진입 브릿지 장치
+        function bypassDirectAuth() {
+            initializeMainDashboard(currentGateViewMode);
+        }
+
+        // 엔터키 지원
+        document.getElementById('sys-pincode').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') executeLogin();
+        });
+
+        // 메인 대시보드 화면 전환 처리 (달력 로딩 지연 가드 장치 추가)
+        function initializeMainDashboard(authRole) {
+            document.getElementById('gateway-root').style.display = 'none';
+            const appContainer = document.getElementById('dashboard-app-root');
+            const visualStyleRoot = document.getElementById('style-visual-root');
+            const authBadge = document.getElementById('authority-badge');
+            const actionSubmitBtn = document.getElementById('side-main-submit-action');
+
+            appContainer.style.display = 'block';
+
+            if (authRole === 'admin') {
+                visualStyleRoot.className = 'dashboard-body-layout admin-view';
+                authBadge.className = 'badge badge-admin';
+                authBadge.innerText = '관리자 모드';
+                actionSubmitBtn.innerText = '관리자 권한 정산 및 설정 강제 적용';
+                document.querySelectorAll('.admin-only-block').forEach(el => el.style.display = 'flex');
+            } else {
+                visualStyleRoot.className = 'dashboard-body-layout';
+                authBadge.className = 'badge badge-op';
+                authBadge.innerText = '운영 모드';
+                actionSubmitBtn.innerText = '입실 처리 및 예약 확정';
+                document.querySelectorAll('.admin-only-block').forEach(el => el.style.display = 'none');
+            }
+
+            // 화면을 먼저 안전하게 연 뒤, 0.1초의 여유를 두고 달력 기능을 안전하게 스핀업합니다.
+            setTimeout(function() {
+                spinUpEmbeddedCalendar();
+            }, 100);
+        }
+
+        // 결제 수단 토글 처리 제어기
+        function setPayMethod(method) {
+            currentSelectedPayMethod = method;
+            document.getElementById('m-card').className = method === 'card' ? 'method-btn selected' : 'method-btn';
+            document.getElementById('m-cash').className = method === 'cash' ? 'method-btn selected' : 'method-btn';
+            document.getElementById('m-room').className = method === 'room' ? 'method-btn selected' : 'method-btn';
+        }
+
+        // 특정 객실 선택 핸들러 연동
+        function focusActiveRoom(roomNum) {
+            currentFocusedRoomNum = roomNum;
+            document.querySelectorAll('.room-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById(`room-${roomNum}`).classList.add('selected');
+            document.getElementById('side-target-room-lbl').innerText = roomNum + "호";
+            
+            const targetCal = document.getElementById('flatpickr-embedded-core');
+            if (targetCal && targetCal._flatpickr) {
+                targetCal._flatpickr.clear();
+                document.getElementById('calc-nights-counter').innerText = "지정된 기간: 이용 기간 없음";
+                document.getElementById('calc-total-price-lbl').innerText = "숙박 총 요금: 0원";
+                currentCalculatedPrice = 0;
+            }
+        }
+
+        // 정산 확정 이벤트 처리기
+        function commitReservationFinal() {
+            const phone = document.getElementById('form-phone-input').value;
+            const payStatus = document.getElementById('form-pay-status').value;
+            
+            if (!phone) {
+                alert("정산 전송을 위해 고객 연락처를 입력해 주세요.");
+                return;
+            }
+            
+            if (currentCalculatedPrice === 0) {
+                alert("달력에서 체크인과 체크아웃 날짜 범위를 드래그하여 지정해야 정산 금액이 산출됩니다.");
+                return;
+            }
+
+            alert(`${currentFocusedRoomNum}호 숙박 정산 처리 완료!\n총
