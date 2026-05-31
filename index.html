@@ -4,60 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hotel Cordelia - 통합 관리 시스템</title>
-    <script>
-        // 캐시 충돌 방지를 위한 버전 강제 인식
-        if (window.location.search.indexOf('v=') === -1) {
-            window.location.replace(window.location.origin + window.location.pathname + '?v=' + new Date().getTime());
-        }
-    </script>
     <style>
-        /* [전체 기능 복원] 다크모드 기반 고대비 스타일 */
-        :root {
-            --bg-main: #0b0f19;
-            --card-bg: #1f2937;
-            --text-dark: #ffffff;
-            --accent-green: #84cc16;
-            --accent-red: #ef4444;
-            --border-color: #374151;
-        }
-        body { background-color: var(--bg-main) !important; color: var(--text-dark) !important; padding: 20px; font-family: sans-serif; }
-        
-        .gateway-container { max-width: 400px; margin: 40px auto; background: var(--card-bg); padding: 30px; border-radius: 20px; border: 1px solid var(--border-color); text-align: center; }
-        .mode-btn { padding: 15px; margin: 5px; border-radius: 10px; border: 1px solid var(--border-color); cursor: pointer; background: #374151; color: white; }
-        .active-op { background: var(--accent-green) !important; color: black; }
-        .active-admin { background: var(--accent-red) !important; }
-        input { width: 100%; padding: 15px; margin: 15px 0; background: #111827; border: 1px solid var(--border-color); color: white; border-radius: 10px; text-align: center; }
-        .main-btn { width: 100%; padding: 15px; background: var(--accent-green); border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        
-        #dashboard-app-root { display: none; }
+        :root { --bg-main: #0b0f19; --card-bg: #1f2937; --text-dark: #ffffff; --accent-green: #84cc16; --border-color: #374151; }
+        body { background-color: var(--bg-main); color: var(--text-dark); padding: 20px; font-family: sans-serif; }
+        .gateway-container { max-width: 400px; margin: 50px auto; background: var(--card-bg); padding: 30px; border-radius: 20px; text-align: center; border: 1px solid var(--border-color); }
+        .app-container { display: none; }
+        .room-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
+        .room-card { background: var(--card-bg); padding: 15px; border: 1px solid var(--border-color); border-radius: 10px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #111827; border: 1px solid var(--border-color); color: white; border-radius: 8px; }
+        .main-btn { width: 100%; padding: 15px; background: var(--accent-green); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="gateway-root" class="gateway-container">
         <h2>HOTEL CORDELIA</h2>
-        <div style="display:flex; gap:10px; margin:20px 0;">
-            <button class="mode-btn active-op" id="btn-op" onclick="mode='op'; this.className='mode-btn active-op'; document.getElementById('btn-admin').className='mode-btn'">운영</button>
-            <button class="mode-btn" id="btn-admin" onclick="mode='admin'; this.className='mode-btn active-admin'; document.getElementById('btn-op').className='mode-btn'">관리자</button>
-        </div>
-        <input type="password" id="pin" placeholder="PIN 번호 입력">
+        <input type="password" id="pin" placeholder="PIN 입력 (0220/0880)">
         <button class="main-btn" onclick="login()">접속하기</button>
     </div>
 
-    <div id="dashboard-app-root">
-        <h1>정산 시스템 접속 성공</h1>
-        <p>기존의 모든 객실 관리 기능이 활성화되었습니다.</p>
+    <div id="dashboard-app-root" class="app-container">
+        <h2>대시보드 (정상 복구 완료)</h2>
+        <div class="room-grid" id="room-list">
+            </div>
     </div>
 
     <script>
-        let mode = 'op';
+        // 8개 객실 카드 생성
+        const list = document.getElementById('room-list');
+        for(let i=101; i<=108; i++) {
+            list.innerHTML += `<div class="room-card">${i}호<br>예약가능</div>`;
+        }
+
         function login() {
             let pin = document.getElementById('pin').value;
-            if((mode === 'op' && pin === '0220') || (mode === 'admin' && pin === '0880')) {
+            if(pin === '0220' || pin === '0880') {
                 document.getElementById('gateway-root').style.display = 'none';
                 document.getElementById('dashboard-app-root').style.display = 'block';
             } else {
-                alert('비밀번호가 틀렸습니다.');
+                alert('비밀번호 오류');
             }
         }
     </script>
