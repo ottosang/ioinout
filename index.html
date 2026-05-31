@@ -3,62 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hotel Cordelia - 통합 관리 시스템</title>
+    <title>Hotel Cordelia - 관리 시스템</title>
     <style>
-        :root { --bg-main: #0b0f19; --card-bg: #1f2937; --text-dark: #ffffff; --accent-green: #84cc16; --accent-red: #ef4444; --border-color: #374151; }
-        body { background-color: var(--bg-main); color: var(--text-dark); padding: 20px; font-family: sans-serif; }
-        
-        .gateway-container { max-width: 400px; margin: 40px auto; background: var(--card-bg); padding: 30px; border-radius: 20px; border: 1px solid var(--border-color); text-align: center; }
-        .app-container { display: none; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
-        
-        .room-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .room-card { background: var(--card-bg); padding: 20px; border: 1px solid var(--border-color); border-radius: 12px; cursor: pointer; text-align: center; }
-        .room-card:hover { border-color: var(--accent-green); }
-        
-        .sidebar { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111827; border: 1px solid var(--border-color); color: white; border-radius: 8px; }
-        .btn-action { width: 100%; padding: 15px; background: var(--accent-green); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        :root { --bg: #0b0f19; --card: #1f2937; --text: #ffffff; --green: #84cc16; --red: #ef4444; --border: #374151; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; font-family: sans-serif; }
+        .gateway { max-width: 400px; margin: 50px auto; background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--border); text-align: center; }
+        .dashboard { display: none; max-width: 1200px; margin: 0 auto; gap: 20px; }
+        @media (min-width: 768px) { .dashboard { display: grid; grid-template-columns: 1fr 350px; } }
+        .room-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+        @media (min-width: 768px) { .room-grid { grid-template-columns: repeat(4, 1fr); } }
+        .room-card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 12px; cursor: pointer; text-align: center; }
+        .room-card.selected { border-color: var(--green); }
+        .sidebar { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #111827; border: 1px solid var(--border); color: white; border-radius: 8px; }
+        .btn { width: 100%; padding: 15px; background: var(--green); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: black; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; }
     </style>
 </head>
 <body>
 
-    <div id="gateway-root" class="gateway-container">
+    <div id="gateway" class="gateway">
         <h2>HOTEL CORDELIA</h2>
-        <button onclick="userMode='op'">운영</button>
-        <button onclick="userMode='admin'">관리자</button>
-        <input type="password" id="pin" placeholder="PIN 입력">
-        <button class="btn-action" onclick="login()">접속</button>
+        <div style="margin:20px 0;">
+            <button id="b-op" onclick="mode='op'; this.style.background='var(--green)'" style="background:var(--green)">운영</button>
+            <button id="b-ad" onclick="mode='admin'; this.style.background='var(--red)'" style="background:#374151">관리자</button>
+        </div>
+        <input type="password" id="pin" placeholder="PIN 입력 (0220/0880)">
+        <button class="btn" onclick="login()">접속하기</button>
     </div>
 
-    <div id="dashboard-app-root" class="app-container">
+    <div id="app" class="dashboard">
         <div>
             <h2>객실 현황</h2>
-            <div class="room-grid" id="room-list"></div>
+            <div class="room-grid" id="list"></div>
+            <table><thead><tr><th>객실</th><th>연락처</th><th>상태</th></tr></thead><tbody id="table"></tbody></table>
         </div>
         <div class="sidebar">
             <h3>객실 제어</h3>
+            <div id="target">101호 선택됨</div>
             <input type="text" id="phone" placeholder="연락처">
-            <button class="btn-action" onclick="checkIn()">입실 처리</button>
+            <button class="btn" onclick="checkIn()">입실 처리</button>
         </div>
     </div>
 
     <script>
-        let userMode = 'op';
-        const list = document.getElementById('room-list');
+        let mode = 'op'; let selected = 101;
+        const list = document.getElementById('list');
+        const table = document.getElementById('table');
+
         for(let i=101; i<=108; i++) {
-            list.innerHTML += `<div class="room-card" onclick="alert('${i}호 선택됨')">${i}호<br>공실</div>`;
+            list.innerHTML += `<div class="room-card" onclick="selected=${i}; document.getElementById('target').innerText='${i}호 선택됨'"> ${i}호<br>공실</div>`;
         }
 
         function login() {
             let pin = document.getElementById('pin').value;
             if(pin === '0220' || pin === '0880') {
-                document.getElementById('gateway-root').style.display = 'none';
-                document.getElementById('dashboard-app-root').style.display = 'grid';
-            } else {
-                alert('비밀번호 오류');
-            }
+                document.getElementById('gateway').style.display = 'none';
+                document.getElementById('app').style.display = 'grid';
+            } else { alert('비밀번호 오류'); }
         }
-        function checkIn() { alert('입실 처리되었습니다.'); }
+
+        function checkIn() {
+            table.innerHTML += `<tr><td>${selected}호</td><td>${document.getElementById('phone').value}</td><td>입실중</td></tr>`;
+            alert('입실 처리 완료');
+        }
     </script>
 </body>
 </html>
