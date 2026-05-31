@@ -6,21 +6,22 @@
     <title>Hotel Cordelia - 통합 관리 시스템</title>
     <style>
         :root {
-            /* 기본 다크모드 변수 전면 배치 */
-            --bg-main: #111827;
-            --card-bg: #1f2937;
-            --text-dark: #f3f4f6;
+            /* 칠흑 현상 해결을 위한 고대비 다크모드 색상 재정의 */
+            --bg-main: #0b0f19;          /* 깊은 밤하늘색 배경 */
+            --card-bg: #1f2937;          /* 뚜렷하게 분리되는 카드/로그인 창 배경 */
+            --text-dark: #f3f4f6;        /* 밝은 텍스트 */
             --text-muted: #9ca3af;
             --border-color: #374151;
             --accent-green: #84cc16;
             --accent-green-hover: #a3e635;
-            --accent-red: #b91c1c;
+            --accent-red: #ef4444;
             --status-bg-green: #064e3b;
             --status-text-green: #34d399;
             --panel-header-bg: #111827;
+            --input-bg: #111827;         /* 입력창 배경 */
         }
 
-        /* 라이트모드 변수 전환용 구조 정의 */
+        /* 라이트모드 변수 */
         [data-theme="light"] {
             --bg-main: #f8f9fa;
             --card-bg: #ffffff;
@@ -33,6 +34,7 @@
             --status-bg-green: #f0fdf4;
             --status-text-green: #16a34a;
             --panel-header-bg: #f9fafb;
+            --input-bg: #f8f9fa;
         }
 
         * {
@@ -48,49 +50,49 @@
             color: var(--text-dark);
             padding: 12px;
             min-height: 100vh;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 0.2s, color 0.2s;
         }
         @media (min-width: 768px) { body { padding: 24px; } }
 
-        /* 모바일 스크린샷 짤림 현상 완치용 게이트웨이 박스 고도화 */
+        /* 배경과 100% 분리되도록 개선된 로그인 컨테이너 */
         .gateway-container {
-            max-width: 380px;
-            margin: 30px auto; /* 마진을 줄여 화면 위쪽으로 바짝 정렬 */
-            background: var(--card-bg);
-            padding: 24px 20px; /* 패딩을 압축하여 모바일 짤림 원천 차단 */
+            max-width: 360px;
+            margin: 40px auto;
+            background-color: var(--card-bg) !important; /* 강제 고정 */
+            padding: 28px 24px;
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
             text-align: center;
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--border-color); /* 테두리를 조금 더 두껍게 해서 가시성 확보 */
         }
 
-        .gateway-header h1 { font-size: 20px; margin-bottom: 4px; letter-spacing: -0.5px; }
-        .gateway-header p { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
+        .gateway-header h1 { font-size: 22px; margin-bottom: 6px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-dark); }
+        .gateway-header p { font-size: 12px; color: var(--text-muted); margin-bottom: 22px; }
 
-        .mode-btn-group { display: flex; gap: 8px; margin-bottom: 16px; }
+        .mode-btn-group { display: flex; gap: 8px; margin-bottom: 18px; }
         .mode-btn {
             flex: 1; padding: 12px 6px; border: 1px solid var(--border-color);
-            background: var(--bg-main); color: var(--text-dark); border-radius: 8px; cursor: pointer;
+            background-color: var(--input-bg); color: var(--text-dark); border-radius: 8px; cursor: pointer;
             font-weight: bold; font-size: 13px; transition: all 0.2s;
         }
-        .mode-btn.active-op { background: var(--accent-green); color: #000; border-color: var(--accent-green); }
-        [data-theme="light"] .mode-btn.active-op { color: #fff; }
-        .mode-btn.active-admin { background: var(--accent-red); color: white; border-color: var(--accent-red); }
+        .mode-btn.active-op { background: var(--accent-green) !important; color: #000000 !important; border-color: var(--accent-green); }
+        [data-theme="light"] .mode-btn.active-op { color: #ffffff !important; }
+        .mode-btn.active-admin { background: var(--accent-red) !important; color: white !important; border-color: var(--accent-red); }
 
         .pin-box input {
-            width: 100%; padding: 12px; border: 1px solid var(--border-color);
-            border-radius: 8px; text-align: center; font-size: 16px;
-            letter-spacing: 4px; margin-bottom: 12px; background: var(--bg-main); color: var(--text-dark);
+            width: 100%; padding: 14px; border: 1px solid var(--border-color);
+            border-radius: 8px; text-align: center; font-size: 18px;
+            letter-spacing: 4px; margin-bottom: 14px; background-color: var(--input-bg); color: var(--text-dark);
         }
-        .error-msg { color: #f87171; font-size: 12px; margin-bottom: 12px; display: none; }
+        .error-msg { color: #f87171; font-size: 12px; margin-bottom: 12px; display: none; font-weight: bold; }
         
         .bypass-btn {
-            background: none; border: none; color: var(--text-muted); font-size: 11px;
-            text-decoration: underline; cursor: pointer; margin-top: 12px;
+            background: none; border: none; color: var(--text-muted); font-size: 12px;
+            text-decoration: underline; cursor: pointer; margin-top: 14px;
             display: inline-block; width: 100%;
         }
 
-        /* 메인 레이아웃 및 상단 탑 바 */
+        /* 메인 대시보드 구조 */
         .app-container { display: none; max-width: 1400px; margin: 0 auto; }
         
         .app-top-bar {
@@ -109,103 +111,4 @@
         @media (min-width: 768px) { .top-bar-actions { width: auto; justify-content: flex-end; } }
         
         .top-btn {
-            padding: 10px 14px; border: 1px solid var(--border-color);
-            background: var(--card-bg); color: var(--text-dark); border-radius: 6px; font-size: 13px; font-weight: 500;
-            cursor: pointer; flex: 1; text-align: center;
-        }
-        @media (min-width: 768px) { .top-btn { flex: none; } }
-        .top-btn:hover { background: #374151; }
-        [data-theme="light"] .top-btn:hover { background: #e5e7eb; }
-
-        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; display: inline-block; text-align: center; }
-        .badge-op { background-color: var(--accent-green); color: #000; }
-        [data-theme="light"] .badge-op { color: #fff; }
-        .badge-admin { background-color: var(--accent-red); }
-
-        .theme-switch-btn { background: #374151; color: #fbbf24; font-weight: bold; }
-        [data-theme="light"] .theme-switch-btn { background: #e5e7eb; color: #374151; }
-
-        /* 지표 요약 카드 레이아웃 */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px; margin-bottom: 16px;
-        }
-        @media (min-width: 900px) {
-            .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
-        }
-        
-        .stats-card {
-            background: var(--card-bg); padding: 14px; border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-        .stats-card .stats-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-        .stats-card .stats-value { font-size: 20px; font-weight: 800; margin: 4px 0; }
-        @media (min-width: 768px) { .stats-card .stats-value { font-size: 26px; } }
-        .stats-card .stats-desc { font-size: 10px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* 반응형 1줄 통합 구조 패치 */
-        .dashboard-body-layout { display: flex; flex-direction: column; gap: 16px; width: 100%; }
-        @media (min-width: 1100px) { .dashboard-body-layout { display: grid; grid-template-columns: 1fr 380px; gap: 16px; } }
-
-        .left-main-stream { display: flex; flex-direction: column; gap: 16px; width: 100%; }
-        .right-control-sidebar { display: flex; flex-direction: column; gap: 16px; width: 100%; }
-
-        .panel-container {
-            background: var(--card-bg); padding: 16px; border-radius: 12px;
-            border: 1px solid var(--border-color); width: 100%;
-        }
-        @media (min-width: 768px) { .panel-container { padding: 24px; } }
-
-        .panel-header-title {
-            font-size: 15px; font-weight: 700; margin-bottom: 16px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        /* 객실 카드 그리드 균형 패치 */
-        .room-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
-        @media (min-width: 550px) { .room-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; } }
-        @media (min-width: 768px) { .room-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; } }
-        
-        .room-card {
-            border: 1px solid var(--border-color); border-radius: 12px;
-            padding: 14px; background: var(--card-bg); cursor: pointer;
-            transition: all 0.2s; position: relative; width: 100%;
-        }
-        .room-card:hover, .room-card.selected { border-color: var(--accent-green); box-shadow: 0 4px 14px rgba(0,0,0,0.2); }
-        .room-card.selected { border-width: 2px; }
-        .admin-view .room-card:hover, .admin-view .room-card.selected { border-color: var(--accent-red); }
-
-        .room-card .room-title-num { font-size: 18px; font-weight: 800; }
-        @media (min-width: 768px) { .room-card .room-title-num { font-size: 22px; } }
-
-        .room-card .status-tag {
-            position: absolute; top: 14px; right: 14px; font-size: 10px;
-            padding: 2px 6px; border-radius: 4px; background: #374151; color: #ccc; font-weight: 600;
-        }
-        [data-theme="light"] .room-card .status-tag { background: #f3f4f6; color: #555; }
-        
-        .room-card.in-use { background: var(--status-bg-green); border-color: #047857; }
-        .room-card.in-use .status-tag { background: #16a34a; color: white; }
-        
-        .room-card.cleaning { background: #451a03; border-color: #78350f; }
-        [data-theme="light"] .room-card.cleaning { background: #fffbeb; border-color: #fde68a; }
-        .room-card.cleaning .status-tag { background: #d97706; color: white; }
-
-        .room-info-list { font-size: 12px; margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
-        .room-info-list div { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 2px; }
-        .room-info-list div span:first-child { color: var(--text-muted); }
-        .room-info-list div span:last-child { font-weight: 600; }
-
-        .card-inner-actions { display: flex; gap: 4px; margin-top: 12px; }
-        .inner-btn {
-            flex: 1; padding: 6px; font-size: 11px; font-weight: 500;
-            border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-dark); border-radius: 6px; cursor: pointer;
-        }
-
-        /* 테이블 스크롤 바 모바일 패치 */
-        .data-table-wrapper { width: 100%; overflow-x: auto; margin-top: 6px; -webkit-overflow-scrolling: touch; }
-        .base-data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; min-width: 550px; }
-        .base-data-table th { background: var(--panel-header-bg); padding: 10px; font-weight: 600; border-bottom: 2px solid var(--border-color); color: var(--text-dark); }
-        .base-data-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-color); color: var(--text-dark); }
-        .table-btn-end { padding: 6px 10px; border: 1px solid #991b1b; background: #7f1d1d; color: #fca5a5; border-radius: 4px; font-weight
+            padding: 10px 14px; border: 1px solid var(--border-
