@@ -1,12 +1,27 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hotel Cordelia - 통합 관리 시스템</title>
     <style>
         :root {
-            /* 라이트모드 변수 */
+            /* 기본 다크모드 변수 전면 배치 */
+            --bg-main: #111827;
+            --card-bg: #1f2937;
+            --text-dark: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+            --accent-green: #84cc16;
+            --accent-green-hover: #a3e635;
+            --accent-red: #b91c1c;
+            --status-bg-green: #064e3b;
+            --status-text-green: #34d399;
+            --panel-header-bg: #111827;
+        }
+
+        /* 라이트모드 변수 전환용 구조 정의 */
+        [data-theme="light"] {
             --bg-main: #f8f9fa;
             --card-bg: #ffffff;
             --text-dark: #222222;
@@ -18,20 +33,6 @@
             --status-bg-green: #f0fdf4;
             --status-text-green: #16a34a;
             --panel-header-bg: #f9fafb;
-        }
-
-        /* 다크모드 전용 변수 오버라이드 */
-        [data-theme="dark"] {
-            --bg-main: #111827;
-            --card-bg: #1f2937;
-            --text-dark: #f3f4f6;
-            --text-muted: #9ca3af;
-            --border-color: #374151;
-            --accent-green: #84cc16;
-            --accent-green-hover: #a3e635;
-            --status-bg-green: #064e3b;
-            --status-text-green: #34d399;
-            --panel-header-bg: #111827;
         }
 
         * {
@@ -51,41 +52,41 @@
         }
         @media (min-width: 768px) { body { padding: 24px; } }
 
-        /* 게이트웨이 로그인 스타일 */
+        /* 모바일 스크린샷 짤림 현상 완치용 게이트웨이 박스 고도화 */
         .gateway-container {
-            max-width: 400px;
-            margin: 40px auto;
+            max-width: 380px;
+            margin: 30px auto; /* 마진을 줄여 화면 위쪽으로 바짝 정렬 */
             background: var(--card-bg);
-            padding: 30px 20px;
+            padding: 24px 20px; /* 패딩을 압축하여 모바일 짤림 원천 차단 */
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             text-align: center;
             border: 1px solid var(--border-color);
         }
 
-        .gateway-header h1 { font-size: 22px; margin-bottom: 6px; letter-spacing: -0.5px; }
-        .gateway-header p { font-size: 13px; color: var(--text-muted); margin-bottom: 25px; }
+        .gateway-header h1 { font-size: 20px; margin-bottom: 4px; letter-spacing: -0.5px; }
+        .gateway-header p { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
 
-        .mode-btn-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        .mode-btn-group { display: flex; gap: 8px; margin-bottom: 16px; }
         .mode-btn {
-            flex: 1; padding: 14px; border: 1px solid var(--border-color);
-            background: #f9fafb; border-radius: 8px; cursor: pointer;
-            font-weight: bold; font-size: 14px; color: #333; transition: all 0.2s;
+            flex: 1; padding: 12px 6px; border: 1px solid var(--border-color);
+            background: var(--bg-main); color: var(--text-dark); border-radius: 8px; cursor: pointer;
+            font-weight: bold; font-size: 13px; transition: all 0.2s;
         }
-        [data-theme="dark"] .mode-btn { color: #fff; background: #374151; }
-        .mode-btn.active-op { background: var(--accent-green); color: white; border-color: var(--accent-green); }
+        .mode-btn.active-op { background: var(--accent-green); color: #000; border-color: var(--accent-green); }
+        [data-theme="light"] .mode-btn.active-op { color: #fff; }
         .mode-btn.active-admin { background: var(--accent-red); color: white; border-color: var(--accent-red); }
 
         .pin-box input {
-            width: 100%; padding: 14px; border: 1px solid var(--border-color);
-            border-radius: 8px; text-align: center; font-size: 18px;
-            letter-spacing: 4px; margin-bottom: 15px; background: var(--card-bg); color: var(--text-dark);
+            width: 100%; padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; text-align: center; font-size: 16px;
+            letter-spacing: 4px; margin-bottom: 12px; background: var(--bg-main); color: var(--text-dark);
         }
-        .error-msg { color: var(--accent-red); font-size: 12px; margin-bottom: 15px; display: none; }
+        .error-msg { color: #f87171; font-size: 12px; margin-bottom: 12px; display: none; }
         
         .bypass-btn {
-            background: none; border: none; color: var(--text-muted); font-size: 12px;
-            text-decoration: underline; cursor: pointer; margin-top: 14px;
+            background: none; border: none; color: var(--text-muted); font-size: 11px;
+            text-decoration: underline; cursor: pointer; margin-top: 12px;
             display: inline-block; width: 100%;
         }
 
@@ -95,8 +96,7 @@
         .app-top-bar {
             display: flex; flex-direction: column; gap: 12px;
             background: var(--card-bg); padding: 16px; border-radius: 12px;
-            margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            border: 1px solid var(--border-color);
+            margin-bottom: 16px; border: 1px solid var(--border-color);
         }
         @media (min-width: 768px) {
             .app-top-bar { flex-direction: row; justify-content: space-between; align-items: center; }
@@ -105,25 +105,25 @@
         .brand-title h2 { font-size: 18px; font-weight: 700; }
         .brand-title p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
         
-        .top-bar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        .top-bar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; width: 100%; justify-content: space-between; }
+        @media (min-width: 768px) { .top-bar-actions { width: auto; justify-content: flex-end; } }
         
         .top-btn {
             padding: 10px 14px; border: 1px solid var(--border-color);
             background: var(--card-bg); color: var(--text-dark); border-radius: 6px; font-size: 13px; font-weight: 500;
-            cursor: pointer; flex: 1; min-width: 80px; text-align: center;
+            cursor: pointer; flex: 1; text-align: center;
         }
         @media (min-width: 768px) { .top-btn { flex: none; } }
-        .top-btn:hover { background: #f3f4f6; }
-        [data-theme="dark"] .top-btn:hover { background: #374151; }
+        .top-btn:hover { background: #374151; }
+        [data-theme="light"] .top-btn:hover { background: #e5e7eb; }
 
         .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; display: inline-block; text-align: center; }
-        .badge-op { background-color: var(--accent-green); }
+        .badge-op { background-color: var(--accent-green); color: #000; }
+        [data-theme="light"] .badge-op { color: #fff; }
         .badge-admin { background-color: var(--accent-red); }
 
-        .theme-switch-btn {
-            background: #e5e7eb; color: #374151; border: none; font-weight: bold;
-        }
-        [data-theme="dark"] .theme-switch-btn { background: #374151; color: #fbbf24; }
+        .theme-switch-btn { background: #374151; color: #fbbf24; font-weight: bold; }
+        [data-theme="light"] .theme-switch-btn { background: #e5e7eb; color: #374151; }
 
         /* 지표 요약 카드 레이아웃 */
         .stats-grid {
@@ -144,15 +144,10 @@
         @media (min-width: 768px) { .stats-card .stats-value { font-size: 26px; } }
         .stats-card .stats-desc { font-size: 10px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* 오류 완치 수동 배치 레이아웃 (모바일과 PC 모두 절대 안 사라지도록 구조 결합) */
-        .dashboard-body-layout {
-            display: flex; flex-direction: column; gap: 16px; width: 100%;
-        }
-        @media (min-width: 1100px) {
-            .dashboard-body-layout { display: grid; grid-template-columns: 1fr 380px; gap: 16px; }
-        }
+        /* 반응형 1줄 통합 구조 패치 */
+        .dashboard-body-layout { display: flex; flex-direction: column; gap: 16px; width: 100%; }
+        @media (min-width: 1100px) { .dashboard-body-layout { display: grid; grid-template-columns: 1fr 380px; gap: 16px; } }
 
-        /* 순서(order) 강제 통일 및 제거하여 미노출 원인 차단 */
         .left-main-stream { display: flex; flex-direction: column; gap: 16px; width: 100%; }
         .right-control-sidebar { display: flex; flex-direction: column; gap: 16px; width: 100%; }
 
@@ -168,28 +163,17 @@
         }
 
         /* 객실 카드 그리드 균형 패치 */
-        .room-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            width: 100%;
-        }
-        @media (min-width: 550px) {
-            .room-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        }
-        @media (min-width: 768px) {
-            .room-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
-        }
+        .room-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
+        @media (min-width: 550px) { .room-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; } }
+        @media (min-width: 768px) { .room-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; } }
         
         .room-card {
             border: 1px solid var(--border-color); border-radius: 12px;
             padding: 14px; background: var(--card-bg); cursor: pointer;
             transition: all 0.2s; position: relative; width: 100%;
         }
-        
-        .room-card:hover, .room-card.selected {
-            border-color: var(--accent-green); box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-        }
+        .room-card:hover, .room-card.selected { border-color: var(--accent-green); box-shadow: 0 4px 14px rgba(0,0,0,0.2); }
+        .room-card.selected { border-width: 2px; }
         .admin-view .room-card:hover, .admin-view .room-card.selected { border-color: var(--accent-red); }
 
         .room-card .room-title-num { font-size: 18px; font-weight: 800; }
@@ -197,16 +181,15 @@
 
         .room-card .status-tag {
             position: absolute; top: 14px; right: 14px; font-size: 10px;
-            padding: 2px 6px; border-radius: 4px; background: #f3f4f6; color: #555; font-weight: 600;
+            padding: 2px 6px; border-radius: 4px; background: #374151; color: #ccc; font-weight: 600;
         }
-        [data-theme="dark"] .room-card .status-tag { background: #374151; color: #ccc; }
+        [data-theme="light"] .room-card .status-tag { background: #f3f4f6; color: #555; }
         
-        .room-card.in-use { background: var(--status-bg-green); border-color: #cbd5e1; }
-        [data-theme="dark"] .room-card.in-use { border-color: #047857; }
+        .room-card.in-use { background: var(--status-bg-green); border-color: #047857; }
         .room-card.in-use .status-tag { background: #16a34a; color: white; }
         
-        .room-card.cleaning { background: #fffbeb; border-color: #fde68a; }
-        [data-theme="dark"] .room-card.cleaning { background: #451a03; border-color: #78350f; }
+        .room-card.cleaning { background: #451a03; border-color: #78350f; }
+        [data-theme="light"] .room-card.cleaning { background: #fffbeb; border-color: #fde68a; }
         .room-card.cleaning .status-tag { background: #d97706; color: white; }
 
         .room-info-list { font-size: 12px; margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
@@ -220,69 +203,9 @@
             border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-dark); border-radius: 6px; cursor: pointer;
         }
 
-        /* 테이블 모바일 터치 패치 */
+        /* 테이블 스크롤 바 모바일 패치 */
         .data-table-wrapper { width: 100%; overflow-x: auto; margin-top: 6px; -webkit-overflow-scrolling: touch; }
         .base-data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; min-width: 550px; }
         .base-data-table th { background: var(--panel-header-bg); padding: 10px; font-weight: 600; border-bottom: 2px solid var(--border-color); color: var(--text-dark); }
         .base-data-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-color); color: var(--text-dark); }
-        .table-btn-end { padding: 6px 10px; border: 1px solid #fee2e2; background: #fef2f2; color: #b91c1c; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        [data-theme="dark"] .table-btn-end { background: #7f1d1d; border-color: #991b1b; color: #fca5a5; }
-
-        .section-block-title { font-size: 14px; font-weight: 700; padding-bottom: 6px; border-bottom: 2px solid var(--border-color); }
-        .focus-room-title { font-size: 24px; font-weight: 800; color: var(--accent-green); }
-
-        .form-row { margin-bottom: 10px; }
-        .form-row label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
-        .form-row input, .form-row select { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; background: var(--bg-main); color: var(--text-dark); }
-        
-        .pay-method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 4px; }
-        .method-btn {
-            padding: 10px 6px; font-size: 12px; font-weight: bold; border: 1px solid var(--border-color);
-            background: var(--card-bg); color: var(--text-dark); border-radius: 6px; cursor: pointer; text-align: center;
-        }
-        .method-btn.selected { background: #f5f6f2; border-color: var(--accent-green); color: var(--accent-green); }
-        [data-theme="dark"] .method-btn.selected { background: #374151; border-color: var(--accent-green); color: var(--accent-green); }
-
-        /* 달력 하우징 */
-        .native-cal-box {
-            display: flex; flex-direction: column; gap: 6px; background: var(--bg-main); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);
-        }
-        @media (min-width: 360px) { .native-cal-box { flex-direction: row; align-items: center; } }
-        .native-cal-box input { flex: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-dark); text-align: center; width: 100%; }
-
-        .total-amount-display-card {
-            background: var(--bg-main); border: 1px solid var(--border-color); padding: 12px;
-            border-radius: 8px; text-align: center; margin-top: 4px;
-        }
-        .total-amount-display-card .amt-label { font-size: 11px; color: var(--text-muted); }
-        .total-amount-display-card .amt-val { font-size: 20px; font-weight: 800; margin-top: 2px; }
-
-        .submit-large-btn {
-            width: 100%; padding: 16px; background: var(--accent-green); color: white;
-            border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;
-        }
-        .submit-large-btn:hover { background: var(--accent-green-hover); }
-        .admin-view .submit-large-btn { background: var(--accent-red); }
-
-        .term-info-desc { font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.4; }
-    </style>
-</head>
-<body>
-
-    <div id="gateway-root" class="gateway-container">
-        <div class="gateway-header">
-            <h1>HOTEL CORDELIA</h1>
-            <p>객실 및 시설 통합 관리 시스템</p>
-        </div>
-        
-        <div class="mode-btn-group">
-            <button id="gate-op-btn" class="mode-btn active-op" onclick="toggleGateTab('op')">운영 화면</button>
-            <button id="gate-admin-btn" class="mode-btn" onclick="toggleGateTab('admin')">관리자 대시보드</button>
-        </div>
-
-        <div class="pin-box">
-            <input type="password" id="sys-pincode" placeholder="PIN 번호 입력" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off">
-            <div id="sys-auth-error" class="error-msg">비밀번호 불일치 (운영:0220 / 관리자:0880)</div>
-        </div>
-
-        <button class="submit-large-btn" style="padding:14px;" onclick="executeLogin()">시스템 안전
+        .table-btn-end { padding: 6px 10px; border: 1px solid #991b1b; background: #7f1d1d; color: #fca5a5; border-radius: 4px; font-weight
