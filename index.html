@@ -1,723 +1,201 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hotel Management - 통합 관리 시스템</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스마트 러닝 가이드 시스템 사업 제안서 | (주)디앤테크</title>
     <style>
-        :root {
-            /* 라이트모드 변수 */
-            --bg-main: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-dark: #222222;
-            --text-muted: #777777;
-            --border-color: #e5e7eb;
-            --accent-green: #656d4a; 
-            --accent-green-hover: #4f5539;
-            --accent-red: #b91c1c;
-            --status-bg-green: #f0fdf4;
-            --status-text-green: #16a34a;
-            --panel-header-bg: #f9fafb;
-        }
-
-        /* 다크모드 전용 변수 오버라이드 */
-        [data-theme="dark"] {
-            --bg-main: #111827;
-            --card-bg: #1f2937;
-            --text-dark: #f3f4f6;
-            --text-muted: #9ca3af;
-            --border-color: #374151;
-            --accent-green: #84cc16;
-            --accent-green-hover: #a3e635;
-            --status-bg-green: #064e3b;
-            --status-text-green: #34d399;
-            --panel-header-bg: #111827;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-dark);
-            padding: 16px;
-            min-height: 100vh;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        /* 게이트웨이 로그인 스타일 */
-        .gateway-container {
-            max-width: 400px;
-            margin: 60px auto;
-            background: var(--card-bg);
-            padding: 30px 20px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .gateway-header h1 { font-size: 22px; margin-bottom: 6px; letter-spacing: -0.5px; }
-        .gateway-header p { font-size: 13px; color: var(--text-muted); margin-bottom: 25px; }
-
-        .mode-btn-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        .mode-btn {
-            flex: 1; padding: 14px; border: 1px solid var(--border-color);
-            background: #f9fafb; border-radius: 8px; cursor: pointer;
-            font-weight: bold; font-size: 14px; color: #333; transition: all 0.2s;
-        }
-        [data-theme="dark"] .mode-btn { color: #fff; background: #374151; }
-        .mode-btn.active-op { background: var(--accent-green); color: white; border-color: var(--accent-green); }
-        .mode-btn.active-admin { background: var(--accent-red); color: white; border-color: var(--accent-red); }
-
-        .pin-box input {
-            width: 100%; padding: 14px; border: 1px solid var(--border-color);
-            border-radius: 8px; text-align: center; font-size: 18px;
-            letter-spacing: 4px; margin-bottom: 15px; background: var(--card-bg); color: var(--text-dark);
-        }
-        .error-msg { color: var(--accent-red); font-size: 12px; margin-bottom: 15px; display: none; }
+        :root { --primary: #003366; --accent: #ff4500; --dark: #121212; --light: #f8f9fa; }
+        body { font-family: 'Pretendard', sans-serif; line-height: 1.8; color: #333; margin: 0; background: var(--light); }
         
-        .bypass-btn {
-            background: none; border: none; color: var(--text-muted); font-size: 12px;
-            text-decoration: underline; cursor: pointer; margin-top: 14px;
-            display: inline-block; width: 100%;
-        }
-
-        /* 메인 레이아웃 및 상단 탑 바 */
-        .app-container { display: none; max-width: 1400px; margin: 0 auto; }
+        /* 1. 보안 접근 페이지 */
+        #pw-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: #121212; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; overflow-y: auto; }
+        .pw-box { border: 1px solid #444; padding: 40px; text-align: center; border-radius: 15px; background: #1a1a1a; width: 450px; max-width: 90%; box-sizing: border-box; margin: 20px auto; }
+        .pw-box h1 { color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 15px; margin-bottom: 20px; font-size: 26px; }
+        .pw-box p { font-size: 18px; margin-bottom: 25px; }
         
-        .app-top-bar {
-            display: flex; flex-direction: column; gap: 12px;
-            background: var(--card-bg); padding: 16px; border-radius: 12px;
-            margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            border: 1px solid var(--border-color);
-        }
-        @media (min-width: 768px) {
-            .app-top-bar { flex-direction: row; justify-content: space-between; align-items: center; }
-        }
+        /* 입력창 및 버튼 디자인 */
+        input[type="password"] { padding: 15px; width: 100%; margin-bottom: 20px; border-radius: 8px; border: 2px solid #ccc; box-sizing: border-box; font-size: 18px; color: #000; text-align: center; }
+        #login-btn { padding: 15px; width: 100%; background-color: #0056b3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 18px; display: block; margin-bottom: 20px; }
+        #login-btn:hover { background-color: #004494; }
         
-        .brand-title h2 { font-size: 18px; font-weight: 700; }
-        .brand-title p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-        
-        .top-bar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-        
-        .top-btn {
-            padding: 10px 14px; border: 1px solid var(--border-color);
-            background: var(--card-bg); color: var(--text-dark); border-radius: 6px; font-size: 13px; font-weight: 500;
-            cursor: pointer; flex: 1; min-width: 80px; text-align: center;
-        }
-        @media (min-width: 768px) { .top-btn { flex: none; } }
-        .top-btn:hover { background: #f3f4f6; }
-        [data-theme="dark"] .top-btn:hover { background: #374151; }
+        .legal-notice { font-size: 12px; color: #aaa; margin-top: 20px; text-align: left; border-top: 1px solid #333; padding-top: 15px; line-height: 1.6; word-break: keep-all; }
 
-        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; display: inline-block; text-align: center; }
-        .badge-op { background-color: var(--accent-green); }
-        .badge-admin { background-color: var(--accent-red); }
-
-        /* 다크모드 토글 스위치 디자인 */
-        .theme-switch-btn {
-            background: #e5e7eb; color: #374151; border: none; font-weight: bold;
-        }
-        [data-theme="dark"] .theme-switch-btn { background: #374151; color: #fbbf24; }
-
-        /* 지표 요약 카드 레이아웃 (모바일 대응 2열 / PC 대응 4열) */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px; margin-bottom: 16px;
-        }
-        @media (min-width: 900px) {
-            .stats-grid { grid-template-columns: repeat(4, 1fr); }
-        }
-        
-        .stats-card {
-            background: var(--card-bg); padding: 16px; border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-        .stats-card .stats-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-        .stats-card .stats-value { font-size: 22px; font-weight: 800; margin: 4px 0; }
-        .stats-card .stats-desc { font-size: 10px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* 메인 분할 레이아웃 (모바일은 1열 직렬 배치 / PC는 2열 병렬 구조) */
-        .dashboard-body-layout {
-            display: flex; flex-direction: column; gap: 16px;
-        }
-        @media (min-width: 1100px) {
-            .dashboard-body-layout { display: grid; grid-template-columns: 1fr 380px; gap: 16px; }
-        }
-
-        .left-main-stream { display: flex; flex-direction: column; gap: 16px; order: 2; }
-        @media (min-width: 1100px) { .left-main-stream { order: 1; } }
-
-        .panel-container {
-            background: var(--card-bg); padding: 16px; border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-        @media (min-width: 768px) { .panel-container { padding: 24px; } }
-
-        .panel-header-title {
-            font-size: 15px; font-weight: 700; margin-bottom: 16px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        /* 객실 카드 반응형 그리드 구조화 */
-        .room-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
-            gap: 12px;
-        }
-        @media (min-width: 480px) {
-            .room-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
-        }
-        
-        .room-card {
-            border: 1px solid var(--border-color); border-radius: 12px;
-            padding: 14px; background: var(--card-bg); cursor: pointer;
-            transition: all 0.2s; position: relative;
-        }
-        @media (min-width: 768px) { .room-card { padding: 20px; } }
-        
-        .room-card:hover, .room-card.selected {
-            border-color: var(--accent-green); box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-        }
-        .admin-view .room-card:hover, .admin-view .room-card.selected { border-color: var(--accent-red); }
-
-        .room-card .room-title-num { font-size: 18px; font-weight: 800; }
-        @media (min-width: 768px) { .room-card .room-title-num { font-size: 22px; } }
-
-        .room-card .status-tag {
-            position: absolute; top: 14px; right: 14px; font-size: 10px;
-            padding: 2px 6px; border-radius: 4px; background: #f3f4f6; color: #555; font-weight: 600;
-        }
-        [data-theme="dark"] .room-card .status-tag { background: #374151; color: #ccc; }
-        
-        .room-card.in-use { background: var(--status-bg-green); }
-        .room-card.in-use .status-tag { background: #16a34a; color: white; }
-        .room-card.cleaning { background: #fffbeb; border-color: #fde68a; }
-        [data-theme="dark"] .room-card.cleaning { background: #451a03; border-color: #78350f; }
-        .room-card.cleaning .status-tag { background: #d97706; color: white; }
-
-        .room-info-list { font-size: 12px; margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
-        .room-info-list div { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 2px; }
-        .room-info-list div span:first-child { color: var(--text-muted); }
-        .room-info-list div span:last-child { font-weight: 600; }
-
-        .card-inner-actions { display: flex; gap: 4px; margin-top: 12px; }
-        .inner-btn {
-            flex: 1; padding: 6px; font-size: 11px; font-weight: 500;
-            border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-dark); border-radius: 6px; cursor: pointer;
-        }
-
-        /* 테이블 모바일 스크롤 바 패치 */
-        .data-table-wrapper { width: 100%; overflow-x: auto; margin-top: 6px; -webkit-overflow-scrolling: touch; }
-        .base-data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; min-width: 500px; }
-        .base-data-table th { background: var(--panel-header-bg); padding: 10px; font-weight: 600; border-bottom: 2px solid var(--border-color); color: var(--text-dark); }
-        .base-data-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-color); color: var(--text-dark); }
-        .table-btn-end { padding: 6px 10px; border: 1px solid #fee2e2; background: #fef2f2; color: #b91c1c; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        [data-theme="dark"] .table-btn-end { background: #7f1d1d; border-color: #991b1b; color: #fca5a5; }
-
-        /* 우측 제어판 사이드바 (모바일은 최상단이나 카드 하단에 전면 배치) */
-        .right-control-sidebar {
-            background: var(--card-bg); padding: 16px; border-radius: 12px;
-            border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 16px;
-            order: 1;
-        }
-        @media (min-width: 1100px) { .right-control-sidebar { padding: 24px; order: 2; position: sticky; top: 16px; } }
-        
-        .section-block-title { font-size: 14px; font-weight: 700; padding-bottom: 6px; border-bottom: 2px solid var(--border-color); }
-        .focus-room-title { font-size: 24px; font-weight: 800; color: var(--accent-green); }
-
-        .form-row { margin-bottom: 10px; }
-        .form-row label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
-        .form-row input, .form-row select { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; background: var(--bg-main); color: var(--text-dark); }
-        
-        .pay-method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 4px; }
-        .method-btn {
-            padding: 10px 6px; font-size: 12px; font-weight: bold; border: 1px solid var(--border-color);
-            background: var(--card-bg); color: var(--text-dark); border-radius: 6px; cursor: pointer; text-align: center;
-        }
-        .method-btn.selected { background: #f5f6f2; border-color: var(--accent-green); color: var(--accent-green); }
-        [data-theme="dark"] .method-btn.selected { background: #374151; border-color: var(--accent-green); color: var(--accent-green); }
-
-        /* 내장 모바일 프렌들리 양방향 달력 레이아웃 */
-        .native-cal-box {
-            display: flex; flex-direction: column; gap: 6px; background: var(--bg-main); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);
-        }
-        @media (min-width: 360px) {
-            .native-cal-box { flex-direction: row; align-items: center; }
-        }
-        .native-cal-box input { flex: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text-dark); text-align: center; width: 100%; }
-
-        .total-amount-display-card {
-            background: var(--bg-main); border: 1px solid var(--border-color); padding: 12px;
-            border-radius: 8px; text-align: center; margin-top: 4px;
-        }
-        .total-amount-display-card .amt-label { font-size: 11px; color: var(--text-muted); }
-        .total-amount-display-card .amt-val { font-size: 20px; font-weight: 800; margin-top: 2px; }
-
-        .submit-large-btn {
-            width: 100%; padding: 16px; background: var(--accent-green); color: white;
-            border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;
-            transition: background 0.2s;
-        }
-        .submit-large-btn:hover { background: var(--accent-green-hover); }
-        .admin-view .submit-large-btn { background: var(--accent-red); }
-
-        .term-info-desc { font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.4; }
+        /* 2. 메인 콘텐츠 디자인 */
+        .content { max-width: 900px; margin: 50px auto; background: white; padding: 60px; border-radius: 20px; box-shadow: 0 10px 50px rgba(0,0,0,0.1); }
+        .content h1 { color: var(--primary); border-bottom: 4px solid var(--primary); padding-bottom: 15px; }
+        .content h2 { color: var(--primary); margin-top: 50px; background: #eef6ff; padding: 12px 20px; border-radius: 8px; border-left: 5px solid var(--primary); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .grid img { width: 100%; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; }
+        table { width: 100%; border-collapse: collapse; margin: 25px 0; background: #fff; }
+        th, td { border: 1px solid #ddd; padding: 15px; text-align: left; }
+        th { background: #f4f7fb; font-weight: bold; }
+        ul { padding-left: 25px; }
+        li { margin-bottom: 8px; }
+        .sub-list { margin-top: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="gateway-root" class="gateway-container">
-        <div class="gateway-header">
-            <h1>HOTEL CORDELIA</h1>
-            <p>객실 및 시설 통합 관리 시스템</p>
-        </div>
+<div id="pw-screen">
+    <div class="pw-box">
+        <h1>Running Guide System</h1>
+        <p>프로젝트 제안서 접속</p>
         
-        <div class="mode-btn-group">
-            <button id="gate-op-btn" class="mode-btn active-op" onclick="toggleGateTab('op')">운영 화면</button>
-            <button id="gate-admin-btn" class="mode-btn" onclick="toggleGateTab('admin')">관리자 대시보드</button>
-        </div>
-
-        <div class="pin-box">
-            <input type="password" id="sys-pincode" placeholder="PIN 번호 입력" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off">
-            <div id="sys-auth-error" class="error-msg">비밀번호 불일치 (운영:0220 / 관리자:0880)</div>
-        </div>
-
-        <button class="submit-large-btn" style="padding:14px;" onclick="executeLogin()">시스템 안전 접속</button>
-        <button class="bypass-btn" onclick="bypassDirectAuth()">[보안 우회하여 대시보드 즉시 확인]</button>
-    </div>
-
-
-    <div id="dashboard-app-root" class="app-container">
+        <input type="password" id="pw-input" placeholder="비밀번호를 입력하세요">
         
-        <div class="app-top-bar">
-            <div class="brand-title">
-                <h2>객실 및 투숙 관리 시스템</h2>
-                <p>투숙객 입실 처리, 실시간 예약 현황 관리 및 객실 정산을 제어합니다.</p>
-            </div>
-            <div class="top-bar-actions">
-                <button class="top-btn theme-switch-btn" onclick="toggleNativeThemeMode()">🌓 다크모드 토글</button>
-                <button class="top-btn" onclick="location.reload();">🔄 새로고침</button>
-                <button class="top-btn" style="color:var(--accent-red);" onclick="clearAllSystemData()">🔄 초기화</button>
-                <span id="authority-badge" class="badge badge-op">운영 모드</span>
-            </div>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stats-card">
-                <div class="stats-label">재실/운영중</div>
-                <div class="stats-value" id="stat-in-use-lbl" style="color: #16a34a;">0 실</div>
-                <div class="stats-desc">현재 투숙 중 객실</div>
-            </div>
-            <div class="stats-card">
-                <div class="stats-label">예약가능 (공실)</div>
-                <div class="stats-value" id="stat-avail-lbl" style="color: var(--text-dark);">8 실</div>
-                <div class="stats-desc">배정 가능한 공실</div>
-            </div>
-            <div class="stats-card">
-                <div class="stats-label">정비/점검 필요</div>
-                <div class="stats-value" id="stat-cleaning-lbl" style="color: #d97706;">0 실</div>
-                <div class="stats-desc">청소 점검 중 상태</div>
-            </div>
-            <div class="stats-card">
-                <div class="stats-label">오늘 정산 매출</div>
-                <div class="stats-value" id="today-revenue-display">0 원</div>
-                <div class="stats-desc">금일 누적 완료 금액</div>
-            </div>
-        </div>
-
-        <div class="dashboard-body-layout" id="style-visual-root">
-            
-            <div class="left-main-stream">
-                <div class="panel-container">
-                    <div class="panel-header-title">
-                        <span>객실 투숙 현황</span>
-                        <span style="font-size:12px; font-weight:normal; color:var(--text-muted);">총 8개 객실</span>
-                    </div>
-                    <div class="room-grid" id="main-room-grid-housing">
-                        </div>
-                </div>
-
-                <div class="panel-container">
-                    <div class="panel-header-title"><span>현재 투숙/이용 중 객실 명단</span></div>
-                    <div class="data-table-wrapper">
-                        <table class="base-data-table">
-                            <thead><tr><th>객실</th><th>고객 연락처</th><th>단위</th><th>상태</th><th>투숙 기간</th><th>관리</th></tr></thead>
-                            <tbody id="live-occupant-table-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="panel-container">
-                    <div class="panel-header-title"><span>최근 퇴실 및 정산 마감 내역</span></div>
-                    <div class="data-table-wrapper">
-                        <table class="base-data-table">
-                            <thead><tr><th>객실</th><th>연락처</th><th>투숙 기간</th><th>정산 금액</th><th>수단</th><th>상태</th></tr></thead>
-                            <tbody id="history-billing-table-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="right-control-sidebar">
-                <div class="form-row">
-                    <div class="section-block-title">선택 객실 제어</div>
-                    <div class="focus-room-title" id="side-target-room-lbl">101호</div>
-                </div>
-
-                <div class="form-row">
-                    <label>고객 연락처</label>
-                    <input type="tel" id="form-phone-input" placeholder="01012345678" inputmode="tel">
-                </div>
-                <div class="form-row">
-                    <label>객실 메모 사항</label>
-                    <input type="text" id="form-memo-input" placeholder="요구사항 기입">
-                </div>
-
-                <div class="form-row">
-                    <label style="font-weight:bold;">투숙 기간 지정 (체크인 / 체크아웃)</label>
-                    <div class="native-cal-box">
-                        <input type="date" id="cal-checkin" onchange="calculateLodgingBill()">
-                        <span style="align-self:center;font-weight:bold;">~</span>
-                        <input type="date" id="calcheckout" onchange="calculateLodgingBill()">
-                    </div>
-                </div>
-
-                <div class="form-row" style="background:var(--bg-main); padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-                    <label>결제 상태 및 수단</label>
-                    <select id="form-pay-status" style="margin-bottom:10px;">
-                        <option value="완료">✅ 정산 및 결제 완료 (매출 즉시 합산)</option>
-                        <option value="미결제" selected>⚠️ 미결제 (현장 후불 정산)</option>
-                    </select>
-                    <div class="pay-method-grid">
-                        <button class="method-btn selected" id="m-card" onclick="setPayMethod('card')">신용카드</button>
-                        <button class="method-btn" id="m-cash" onclick="setPayMethod('cash')">현금정산</button>
-                        <button class="method-btn" id="m-room" onclick="setPayMethod('room')">객실차지</button>
-                    </div>
-
-                    <div class="total-amount-display-card">
-                        <div class="amt-label" id="calc-nights-counter">이용 기간: 날짜를 선택해 주세요</div>
-                        <div class="amt-val" id="calc-total-price-lbl">숙박 총 요금: 0원</div>
-                    </div>
-                </div>
-
-                <button class="submit-large-btn" id="side-main-submit-action" onclick="commitReservationFinal()">입실 처리 및 예약 확정</button>
-            </div>
+        <button id="login-btn">문서접근</button>
+        
+        <div class="legal-notice">
+            [법적 고지]<br>
+            본 제안서의 모든 기획 내용, 기술 사양 및 디자인은 (주)디앤테크의 지적 자산입니다. 
+            승인되지 않은 복제, 배포 및 공유를 엄격히 금지하며, 위반 시 관련 법령에 의거하여 처벌받을 수 있습니다.
         </div>
     </div>
+</div>
 
-    <script>
-        let currentGateMode = 'op';
-        let currentRoom = '101';
-        let currentMethod = 'card';
-        let finalPrice = 0;
-        let currentRoleCtx = 'op';
+<div id="main-content" style="display:none;" class="content">
+    <h1>스마트 러닝 가이드 시스템 사업 제안서</h1>
+    
+    <h2>1. 프로젝트 개요 및 배경</h2>
+    <p>본 프로젝트는 단순 운동 시설을 고도화된 IoT 스마트 인프라로 전환하여, 도시 공원의 가치를 제고하는 핵심 사업입니다. 단순히 LED 조명을 설치하는 것이 아니라, 시민의 건강 증진과 더불어 지역의 랜드마크로서 기능하도록 기획되었습니다.</p>
+    <ul>
+        <li><b>지자체 홍보 거점:</b> 스마트 시티 모델 사업으로서의 가치를 높여 전국 단위 러닝 성지로서의 브랜딩 추진.</li>
+        <li><b>지역 사회 핵심 이슈 사업:</b> 시민 참여형 건강 프로그램을 활성화하여 지역 커뮤니티의 결속력 강화.</li>
+    </ul>
 
-        const roomRates = { '101': 50000, '102': 50000, '103': 60000, '104': 55000, '105': 55000, '106': 70000, '107': 65000, '108': 80000 };
+    <h2>2. 제품 및 서비스 개요</h2>
+    <p>국내 러닝 인프라의 표준이 될 최첨단 러닝 가이드 시스템입니다. 1m 간격으로 매립된 모듈과 50cm 간격의 LED 연동을 통해 러너에게 실시간 페이스메이커를 제공합니다. 사용자는 키오스크 혹은 본인의 스마트폰(QR 스캔)으로 즉시 러닝을 시작할 수 있습니다.</p>
+    
+    <div class="grid">
+        <img src="Gemini_Generated_Image_eirstgeirstgeirs.png" alt="시스템 구성">
+        <img src="Gemini_Generated_Image_i7jiw5i7jiw5i7ji.png" alt="기술 도면">
+        <img src="스크린샷 2026-07-02 오후 7.03.27.png" alt="제품 프로토타입 디자인">
+        <img src="Gemini_Generated_Image_mpzvjbmpzvjbmpzv.png" alt="키오스크 제작 도면">
+    </div>
 
-        let systemState = {
-            rooms: {
-                '101': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 },
-                '102': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 },
-                '103': { status: 'in-use', phone: '010-****-0220', memo: '기본 세션 고정', period: '일 단위 대기', price: 0 },
-                '104': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 },
-                '105': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 },
-                '106': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 },
-                '107': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 },
-                '108': { status: 'available', phone: '-', memo: '-', period: '-', price: 0 }
-            },
-            history: [],
-            todayRevenue: 0
-        };
+    <h2>3. 핵심 시스템 구성 및 운영</h2>
+    <table>
+        <tr><th>구분</th><th>단계</th><th>주요 내용</th></tr>
+        <tr><td>사용자 인증</td><td>1단계</td><td>키오스크 또는 스마트폰 QR 스캔을 통한 사용자 식별 및 레벨 선택</td></tr>
+        <tr><td>페이스 안내</td><td>2단계</td><td>7단계 페이스 설정, 실시간 컬러 LED 라이트 가이드</td></tr>
+        <tr><td>통합 관리</td><td>3단계</td><td>4,000개 모듈의 중앙 통합 관제 및 데이터 분석</td></tr>
+    </table>
 
-        if (localStorage.getItem('cordelia_sys_state')) {
-            systemState = JSON.parse(localStorage.getItem('cordelia_sys_state'));
-        }
+    <h2>4. 기술적 난제 해결 및 고도화 전략</h2>
+    <table>
+        <tr><th>기술 항목</th><th>해결 전략 및 상세 사양</th></tr>
+        <tr><td>방수 및 내구성</td><td>IP68 등급 보장, 특수 투명 우레탄 진공 몰딩(충격/침수 방지)</td></tr>
+        <tr><td>통신 안정성</td><td>LoRa/NB-IoT 기반 저전력 원거리 통신, 대규모 모듈 정밀 제어</td></tr>
+        <tr><td>페이스 동기화</td><td>NTP(Network Time Protocol) 기반 중앙-모듈 간 초정밀 시간 동기화</td></tr>
+        <tr><td>에너지 관리</td><td>태양광 자가 발전과 스마트 BMS를 결합한 전력 효율 로직</td></tr>
+        <tr><td>인증/유지보수</td><td>KC 전파 인증 사전 획득, 현장 교체형 모듈화 설계</td></tr>
+    </table>
 
-        // 테마 상태 로드 초기화
-        const savedTheme = localStorage.getItem('cordelia_theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
+    <h2>5. 시제품 제작 실비 견적 항목 (단위: 원)</h2>
+    <table>
+        <tr><th>구분</th><th>항목</th><th>상세 내용</th><th>예상 실비 (단위)</th></tr>
+        <tr><td rowspan="4">H/W 개발</td><td>LED 모듈 PCB</td><td>1m 매립형 바닥 조명 전용 기판 설계 및 제작</td><td>500,000 ~ 1,000,000</td></tr>
+        <tr><td>기구 프레임</td><td>알루미늄 합금 케이스 CNC 가공 (시제품용)</td><td>1,000,000 ~ 2,000,000</td></tr>
+        <tr><td>투명 우레탄 몰딩</td><td>진공 몰딩용 금형 및 우레탄 액상 재료비</td><td>500,000 ~ 1,000,000</td></tr>
+        <tr><td>핵심 부품</td><td>태양광 패널, 고휘도 LED, 배터리, 컨트롤러 등</td><td>1,500,000 ~ 3,000,000</td></tr>
+        <tr><td rowspan="2">S/W 개발</td><td>펌웨어/제어</td><td>중앙 컨트롤러 제어 로직 및 모듈 통신 S/W</td><td>3,000,000 ~ 5,000,000</td></tr>
+        <tr><td>앱/키오스크 연동</td><td>QR 스캔 페이지 및 사용자 인터페이스(UI) 개발</td><td>3,000,000 ~ 5,000,000</td></tr>
+        <tr><td>기타</td><td>테스트 베드</td><td>실제 러닝 트랙 설치 및 테스트 환경 구축비</td><td>1,000,000 ~ 2,000,000</td></tr>
+        <tr style="background-color: #f4f7fb; font-weight: bold;"><td>합계</td><td>예상 실비</td><td>시제품 1세트(수량 10개 기준) 제작 예산</td><td>약 1,000만 ~ 2,000만 원</td></tr>
+    </table>
 
-        function toggleNativeThemeMode() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('cordelia_theme', newTheme);
-        }
+    <h2>6. 스마트 러닝 가이드 시스템 시제품 제작 로드맵</h2>
+    <table>
+        <tr><th>단계</th><th>주요 업무</th><th>기간</th><th>핵심 마일스톤</th></tr>
+        <tr><td>1단계</td><td>기획 및 시스템 설계</td><td>1~2주</td><td>시스템 사양 확정 및 상세 설계(도면 완료)</td></tr>
+        <tr><td>2단계</td><td>H/W 부품 발주 및 가공</td><td>3~8주</td><td>PCB, 알루미늄 케이스 가공 및 조립 완료</td></tr>
+        <tr><td>3단계</td><td>S/W 개발 및 연동</td><td>3~12주</td><td>앱/키오스크 UI, 서버 통신 로직, 펌웨어 개발</td></tr>
+        <tr><td>4단계</td><td>통합 테스트 및 시운전</td><td>13~16주</td><td>실외 현장 설치, 방수/통신 테스트, 최종 안정화</td></tr>
+    </table>
 
-        function saveStateToStorage() {
-            localStorage.setItem('cordelia_sys_state', JSON.stringify(systemState));
-        }
+    <h2>7. 주차별 상세 추진 일정</h2>
+    <ul>
+        <li><b>1개월 차: 기획 및 설계 (1~4주)</b>
+            <ul class="sub-list">
+                <li>1~2주: 시스템 요구사항 정의(SRS), 부품 명세서(BOM) 작성, 업체 선정.</li>
+                <li>3~4주: 모듈 3D 기구 설계 및 회로도 작성, 키오스크 UI/UX 레이아웃 설계.</li>
+            </ul>
+        </li>
+        <li><b>2개월 차: H/W 가공 및 S/W 착수 (5~8주)</b>
+            <ul class="sub-list">
+                <li>5~6주: PCB 기판 제작 및 핵심 부품(태양광, 배터리, LED) 발주.</li>
+                <li>7~8주: 알루미늄 합금 케이스 CNC 가공 및 외주 업체 조립, S/W 개발 환경 구축 및 기초 로직 구현.</li>
+            </ul>
+        </li>
+        <li><b>3개월 차: 통합 개발 (9~12주)</b>
+            <ul class="sub-list">
+                <li>9~10주: LED 모듈 펌웨어 코딩, 중앙 컨트롤러 통신 연동 테스트(LoRa/NB-IoT), QR 코드 연동 서버 개발.</li>
+                <li>11~12주: 키오스크/스마트폰 통합 인터페이스 개발, 방수/진공 몰딩 처리 공정 적용.</li>
+            </ul>
+        </li>
+        <li><b>4개월 차: 현장 검증 및 보완 (13~16주)</b>
+            <ul class="sub-list">
+                <li>13~14주: 현장 실물 설치, 방수 테스트(IP68 검증), 통신망 환경 테스트.</li>
+                <li>15주: 페이스 싱크 정밀도 측정 및 안정화(NTP 동기화 최적화), 오류 보완.</li>
+                <li>16주: 최종 시제품 성능 평가 및 제안 사업 보고서 마무리.</li>
+            </ul>
+        </li>
+    </ul>
 
-        function toggleGateTab(mode) {
-            currentGateMode = mode;
-            document.getElementById('gate-op-btn').className = mode === 'op' ? 'mode-btn active-op' : 'mode-btn';
-            document.getElementById('gate-admin-btn').className = mode === 'admin' ? 'mode-btn active-admin' : 'mode-btn';
-            document.getElementById('sys-pincode').value = '';
-            document.getElementById('sys-auth-error').style.display = 'none';
-        }
+    <h2>8. 개발 성공을 위한 전략적 제언</h2>
+    <ul>
+        <li><b>병행 개발(Concurrent Engineering):</b> 하드웨어 제작과 소프트웨어 개발을 별도 팀으로 운영하여 병행 수행하면 기간을 최대 2주 정도 단축할 수 있습니다.</li>
+        <li><b>테스트 베드 조기 확보:</b> 14주 차 현장 테스트를 위해 3개월 차 말부터 지자체나 공원 관리 측과 사전 협의하여 테스트 코스를 확보해야 합니다.</li>
+        <li><b>위험 관리(Risk Management):</b> 통신 지연이나 방수 이슈는 시제품 제작 초기(2개월 차)에 샘플 모듈을 만들어 미리 검증하는 것이 전체 일정을 지키는 핵심입니다.</li>
+    </ul>
 
-        function executeLogin() {
-            const pin = document.getElementById('sys-pincode').value.trim();
-            if (currentGateMode === 'op' && pin === '0220') { openDashboard('op'); } 
-            else if (currentGateMode === 'admin' && pin === '0880') { openDashboard('admin'); } 
-            else { document.getElementById('sys-auth-error').style.display = 'block'; }
-        }
+    <h2>9. 제안사 소개 및 주요 실적</h2>
+    <p><b>(주)디앤테크</b>는 30년 이상의 보안 및 제어 시스템 구축 노하우를 가진 IoT 전문 기업입니다. 현실 공간을 제어하는 고도화된 솔루션을 제공합니다. (<a href="http://www.iokey.io" target="_blank">www.iokey.io</a>)</p>
+    
+    <img src="스크린샷 2026-07-02 오후 10.28.35.jpg" alt="디앤테크 회사 소개" style="width: 100%; border-radius: 10px; margin: 20px 0; border: 1px solid #ddd;">
+    
+    <ul>
+        <li>금강산 관광지역 전체 페이먼트 시스템</li>
+        <li>국내 최초 공공자전거(청원누비자) 무인 대여 시스템</li>
+        <li>평창 휘닉스 스키장 자동 검표 및 용평리조트 자율주행 모노레일</li>
+        <li>QR코드 기반 OPT 인증 및 테이블오더 시스템</li>
+        <li><b>이 외에도 30년간 축적된 기술력을 바탕으로 다수의 스마트 제어 및 공공/민간 IoT 인프라 구축 프로젝트를 성공적으로 수행해 오고 있습니다.</b></li>
+    </ul>
 
-        function bypassDirectAuth() { openDashboard(currentGateMode); }
+    <h2>10. 기대 효과 및 비전</h2>
+    <p>본 사업은 단순한 조명 설치를 넘어 스마트 시티 인프라의 미래상을 제시합니다. 전국 러너들이 방문하는 '러닝 성지' 조성을 통해 지역 관광 활성화 및 시민 삶의 질 향상을 도모합니다.</p>
+</div>
 
-        document.getElementById('sys-pincode').addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') executeLogin();
-        });
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var loginBtn = document.getElementById('login-btn');
+        var pwInput = document.getElementById('pw-input');
 
-        function openDashboard(role) {
-            currentRoleCtx = role;
-            document.getElementById('gateway-root').style.display = 'none';
-            document.getElementById('dashboard-app-root').style.display = 'block';
-            
-            const vRoot = document.getElementById('style-visual-root');
-            const badge = document.getElementById('authority-badge');
-            const sBtn = document.getElementById('side-main-submit-action');
-
-            if (role === 'admin') {
-                vRoot.className = 'dashboard-body-layout admin-view';
-                badge.className = 'badge badge-admin'; badge.innerText = '관리자 모드';
-            } else {
-                vRoot.className = 'dashboard-body-layout';
-                badge.className = 'badge badge-op'; badge.innerText = '운영 모드';
+        function performLogin() {
+            var password = pwInput.value.trim(); 
+            if(password === '1609') {
+                document.getElementById('pw-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else { 
+                alert('비밀번호가 일치하지 않습니다.'); 
+                pwInput.value = ''; 
+                pwInput.focus();
             }
-            
-            const todayStr = new Date().toISOString().split('T')[0];
-            document.getElementById('cal-checkin').min = todayStr;
-            document.getElementById('calcheckout').min = todayStr;
-
-            refreshCoreDashboardUI();
         }
 
-        function refreshCoreDashboardUI() {
-            const gridHousing = document.getElementById('main-room-grid-housing');
-            gridHousing.innerHTML = '';
+        if(loginBtn) {
+            loginBtn.addEventListener('click', performLogin);
+        }
 
-            let inUseCount = 0;
-            let cleaningCount = 0;
-            let availCount = 0;
-
-            Object.keys(systemState.rooms).forEach(rm => {
-                const roomData = systemState.rooms[rm];
-                let statusText = '예약가능';
-                let statusClass = '';
-
-                if (roomData.status === 'in-use') {
-                    statusText = '이용중'; statusClass = 'in-use'; inUseCount++;
-                } else if (roomData.status === 'cleaning') {
-                    statusText = '정비중'; statusClass = 'cleaning'; cleaningCount++;
-                } else {
-                    availCount++;
-                }
-
-                const isSelected = (rm === currentRoom) ? 'selected' : '';
-                const adminControlBlock = (currentRoleCtx === 'admin') ? 
-                    `<div class="card-inner-actions">
-                        <button class="inner-btn" onclick="event.stopPropagation(); forceChangeRoomStatus('${rm}', 'available')">공실화</button>
-                        <button class="inner-btn" onclick="event.stopPropagation(); forceChangeRoomStatus('${rm}', 'cleaning')">정비</button>
-                     </div>` : '';
-
-                const cardHtml = `
-                    <div class="room-card ${statusClass} ${isSelected}" id="room-${rm}" onclick="focusActiveRoom('${rm}')">
-                        <div class="room-title-num">${rm}호</div>
-                        <span class="status-tag">${statusText}</span>
-                        <div class="room-info-list">
-                            <div><span>투숙 기간</span><span>${roomData.period}</span></div>
-                            <div><span>연락처</span><span>${roomData.phone}</span></div>
-                            <div><span>요금</span><span>${roomData.price.toLocaleString()}원</span></div>
-                        </div>
-                        ${adminControlBlock}
-                    </div>
-                `;
-                gridHousing.innerHTML += cardHtml;
-            });
-
-            document.getElementById('stat-in-use-lbl').innerText = inUseCount + " 실";
-            document.getElementById('stat-avail-lbl').innerText = availCount + " 실";
-            document.getElementById('stat-cleaning-lbl').innerText = cleaningCount + " 실";
-            document.getElementById('today-revenue-display').innerText = systemState.todayRevenue.toLocaleString() + " 원";
-
-            const tableBody = document.getElementById('live-occupant-table-body');
-            tableBody.innerHTML = '';
-            
-            let hasLive = false;
-            Object.keys(systemState.rooms).forEach(rm => {
-                const roomData = systemState.rooms[rm];
-                if (roomData.status === 'in-use') {
-                    hasLive = true;
-                    const rowHtml = `
-                        <tr>
-                            <td style="font-weight:bold;">${rm}호</td>
-                            <td>${roomData.phone}</td>
-                            <td>일 단위</td>
-                            <td style="color:var(--status-text-green); font-weight:bold;">투숙중</td>
-                            <td>${roomData.period}</td>
-                            <td><button class="table-btn-end" onclick="checkoutRoomSession('${rm}')">퇴실/마감</button></td>
-                        </tr>
-                    `;
-                    tableBody.innerHTML += rowHtml;
+        if(pwInput) {
+            pwInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    performLogin();
                 }
             });
-            if (!hasLive) {
-                tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999; padding:16px;">현재 투숙 중인 객실이 없습니다.</td></tr>`;
-            }
-
-            const historyBody = document.getElementById('history-billing-table-body');
-            historyBody.innerHTML = '';
-            if (systemState.history.length === 0) {
-                historyBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999; padding:16px;">금일 정산 마감 내역이 없습니다.</td></tr>`;
-            } else {
-                systemState.history.forEach(item => {
-                    const rowHtml = `
-                        <tr>
-                            <td style="font-weight:bold;">${item.room}호</td>
-                            <td>${item.phone}</td>
-                            <td>${item.period}</td>
-                            <td style="font-weight:bold;">${item.price.toLocaleString()}원</td>
-                            <td>${item.method.toUpperCase()}</td>
-                            <td style="color:var(--status-text-green); font-weight:bold;">${item.payStatus}</td>
-                        </tr>
-                    `;
-                    historyBody.innerHTML += rowHtml;
-                });
-            }
         }
-
-        function setPayMethod(m) {
-            currentMethod = m;
-            document.getElementById('m-card').className = m === 'card' ? 'method-btn selected' : 'method-btn';
-            document.getElementById('m-cash').className = m === 'cash' ? 'method-btn selected' : 'method-btn';
-            document.getElementById('m-room').className = m === 'room' ? 'method-btn selected' : 'method-btn';
-        }
-
-        function focusActiveRoom(rm) {
-            currentRoom = rm;
-            document.getElementById('side-target-room-lbl').innerText = rm + "호";
-            
-            document.getElementById('form-phone-input').value = '';
-            document.getElementById('form-memo-input').value = '';
-            document.getElementById('cal-checkin').value = '';
-            document.getElementById('calcheckout').value = '';
-            document.getElementById('calc-nights-counter').innerText = "이용 기간: 날짜를 선택해 주세요";
-            document.getElementById('calc-total-price-lbl').innerText = "숙박 총 요금: 0원";
-            finalPrice = 0;
-
-            refreshCoreDashboardUI();
-        }
-
-        function calculateLodgingBill() {
-            const cin = document.getElementById('cal-checkin').value;
-            const cout = document.getElementById('calcheckout').value;
-            const cntLbl = document.getElementById('calc-nights-counter');
-            const prcLbl = document.getElementById('calc-total-price-lbl');
-
-            if (cin && cout) {
-                const d1 = new Date(cin);
-                const d2 = new Date(cout);
-                
-                if (d2 <= d1) {
-                    cntLbl.innerText = "⚠️ 퇴실일 지정 에러";
-                    prcLbl.innerText = "총 요금: 계산 불가";
-                    finalPrice = 0; return;
-                }
-
-                const diff = Math.abs(d2 - d1);
-                const nights = Math.ceil(diff / (1000 * 60 * 60 * 24));
-                
-                const rate = roomRates[currentRoom] || 50000;
-                finalPrice = nights * rate;
-
-                cntLbl.innerHTML = `${nights}박 지정됨 (${cin} ~ ${cout})`;
-                prcLbl.innerText = `숙박 총 요금: ${finalPrice.toLocaleString()}원`;
-            }
-        }
-
-        function commitReservationFinal() {
-            const phone = document.getElementById('form-phone-input').value.trim();
-            const memo = document.getElementById('form-memo-input').value.trim() || '-';
-            const cin = document.getElementById('cal-checkin').value;
-            const cout = document.getElementById('calcheckout').value;
-            const payStat = document.getElementById('form-pay-status').value;
-
-            if (!phone) { alert("고객 연락처를 입력해 주세요."); return; }
-            if (finalPrice === 0) { alert("투숙 일정을 정확히 지정해 주세요."); return; }
-
-            systemState.rooms[currentRoom] = {
-                status: 'in-use',
-                phone: phone,
-                memo: memo,
-                period: `${cin} ~ ${cout}`,
-                price: finalPrice
-            };
-
-            if (payStat === '완료') {
-                systemState.todayRevenue += finalPrice;
-                systemState.history.unshift({
-                    room: currentRoom,
-                    phone: phone,
-                    period: `${cin} ~ ${cout}`,
-                    price: finalPrice,
-                    method: currentMethod,
-                    payStatus: '정산완료'
-                });
-            }
-
-            saveStateToStorage();
-            refreshCoreDashboardUI();
-
-            alert(`${currentRoom}호 체크인이 완료되었습니다!`);
-        }
-
-        function checkoutRoomSession(rm) {
-            const target = systemState.rooms[rm];
-            if (!target) return;
-
-            if (confirm(`${rm}호를 정산 마감하고 퇴실(정비 전환) 조치하시겠습니까?`)) {
-                const alreadyInHistory = systemState.history.some(h => h.room === rm && h.period === target.period);
-                if (!alreadyInHistory) {
-                    systemState.history.unshift({
-                        room: rm,
-                        phone: target.phone,
-                        period: target.period,
-                        price: target.price,
-                        method: '현장정산',
-                        payStatus: '후불마감'
-                    });
-                    systemState.todayRevenue += target.price;
-                }
-
-                systemState.rooms[rm] = { status: 'cleaning', phone: '-', memo: '-', period: '-', price: 0 };
-                
-                saveStateToStorage();
-                refreshCoreDashboardUI();
-            }
-        }
-
-        function forceChangeRoomStatus(rm, nextStatus) {
-            systemState.rooms[rm] = { status: nextStatus, phone: '-', memo: '-', period: '-', price: 0 };
-            saveStateToStorage();
-            refreshCoreDashboardUI();
-        }
-
-        function clearAllSystemData() {
-            if (confirm("🚨 시스템의 모든 보존 데이터를 삭제하고 초기화하시겠습니까?")) {
-                localStorage.removeItem('cordelia_sys_state');
-                location.reload();
-            }
-        }
-    </script>
+    });
+</script>
 </body>
 </html>
-
